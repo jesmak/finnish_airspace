@@ -9,51 +9,7 @@ import pytest
 
 from custom_components.finnish_airspace.bulletin import AreaType, Kind, Notam, Supplement, parse_bulletin
 
-FONT = """style='font-size:9.0pt; font-family:"Courier New"'"""
-P = '<p class="x_MsoNormal" style="margin:0cm; margin-bottom:.0001pt">'
-
-
-def table(lines: list[str], id: str, start: str, end: str, lower: str | None = None, upper: str | None = None, schedule=None) -> str:
-    """One NOTAM in Word's markup, as the bulletin has it."""
-    *paragraphs, last = lines
-    text = "".join(f"{P}{line}</p>" for line in paragraphs) + last
-    heights = (
-        f"<div>{P}<b><span {FONT}>LOWER: </span></b><span {FONT}>{lower}</span><b><span {FONT}> UPPER: </span></b>"
-        f"<span {FONT}>{upper}</span></p></div>"
-        if lower
-        else ""
-    )
-    period = (
-        f'<div>{P}<span class="x_endgap"><b><span {FONT}>FROM: </span></b></span><span class="x_endgap"><span {FONT}>{start}'
-        f"</span></span><span {FONT}><b> \n      TO:\n    </b>{end}\n        ({id})\n      </span></p></div>"
-    )
-    scheduled = (
-        f'<div>{P}<span class="x_endgap"><b><span {FONT}>SCHEDULE: </span></b></span><span class="x_endgap"><span {FONT}>'
-        f"{schedule}</span></span></p></div>"
-        if schedule
-        else ""
-    )
-    return (
-        '<table class="x_MsoNormalTable" border="0" cellspacing="0" cellpadding="0" width="100%"><tbody><tr>'
-        f'<td width="27" valign="top" style="width:20.4pt">{P}<span {FONT}>+</span></p></td>'
-        f"""<td style="padding:.75pt"><span style='font-size:9.0pt; font-family:"Monospace"'>{text}</span>"""
-        f"{heights}{period}{scheduled}</td></tr></tbody></table>"
-    )
-
-
-def heading(level: int, name: str) -> str:
-    return f"""<h{level}><span style='font-size:13.5pt; font-family:"Courier New"'>{name}</span></h{level}>"""
-
-
-def page(*parts: str, next_update: str = "1130") -> str:
-    return (
-        '<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></meta>'
-        '<title>HELSINKI FIR (IFR)</title></head><body><table width="100%"><tr><td width="60%"><span class="sh1">'
-        'Bulletin: HELSINKI FIR (IFR)</span></td></tr><tr><td width="60%"><span class="sh2">Next update at APRX '
-        f"{next_update} UTC</span></td></tr></table>{''.join(parts)}<div><p><i><span>END OF PIB</span></i></p>"
-        "YOU ARE KINDLY ASKED TO INFORM NOTAM OFFICE OF POSSIBLE FAULTS. TEL +358 29 000 0000.</div></body></html>"
-    )
-
+from .pages import FONT, P, heading, page, table
 
 CLOSED = table(["EXAMPLE AFIS CLSD. OPENING REQUESTS", "TEL +358 40 000 0001"], "B0001/26", "06APR26 1130", "19NOV26 2359")
 DANGER = table(

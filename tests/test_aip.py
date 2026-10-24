@@ -2,29 +2,11 @@
 
 from __future__ import annotations
 
-import io
-
 import pytest
-from pypdf import PdfWriter
-from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
 from custom_components.finnish_airspace.aip import parse_enr_5_1, parse_supplement
 
-
-def row(title: str, points: str, upper: str, lower: str, remarks: str = "AMC manageable area") -> str:
-    """An area's row in ENR 5.1, its heights in a table of their own inside the row."""
-    span = '<span space="preserve" style="font-family: Arial ,PMingLiU;"><span space="preserve" style="font-size:12px;">'
-    return (
-        f'<tr><td style="text-align: left" valign="top"><a id="1tab2"></a>{span}<span class="bold"><strong>{title}</strong></span>'
-        f"</span></span><br>{span}Area bounded by lines joining points <br> {points} to point of origin.</span></span><br></td>"
-        '<td style="text-align: center"><div class="dynamic"><table class="IndSubTable" border="0" width="100%"><tbody>'
-        "<tr><td></td><td></td><td></td></tr>"
-        f"<tr><td></td><td>{span}{upper}</span></span><br>{span}<hr></hr></span></span><br></td><td></td></tr>"
-        f"<tr><td></td><td>{span}{lower}</span></span><br></td><td></td></tr>"
-        "<tr><td></td><td></td><td></td></tr></tbody></table></div></td>"
-        f"<td>{span}MILOPS</span></span></td><td>{span}NOTAM</span></span></td><td>{span}{remarks}</span></span></td></tr>"
-    )
-
+from .pages import pdf, row
 
 ENR_5_1 = (
     '<html><body><div class="P2_default">2.10. For a flight within EFR100 crossing the state border that has submitted a '
@@ -74,29 +56,6 @@ def test_efr100_without_a_name_along_the_border() -> None:
 def test_a_page_without_areas_is_an_error() -> None:
     with pytest.raises(ValueError):
         parse_enr_5_1("<html><body>Page not found</body></html>")
-
-
-def pdf(*pages: list[str]) -> bytes:
-    """A PDF of lines of text, a page for each list."""
-    writer = PdfWriter()
-    font = DictionaryObject(
-        {
-            NameObject("/Type"): NameObject("/Font"),
-            NameObject("/Subtype"): NameObject("/Type1"),
-            NameObject("/BaseFont"): NameObject("/Helvetica"),
-            NameObject("/Encoding"): NameObject("/WinAnsiEncoding"),
-        }
-    )
-    for lines in pages:
-        page = writer.add_blank_page(595, 842)
-        page[NameObject("/Resources")] = DictionaryObject({NameObject("/Font"): DictionaryObject({NameObject("/F1"): font})})
-        escaped = (line.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)") for line in lines)
-        content = DecodedStreamObject()
-        content.set_data(("BT /F1 10 Tf 12 TL 50 800 Td " + " ".join(f"({line}) Tj T*" for line in escaped) + " ET").encode("cp1252"))
-        page.replace_contents(content)
-    result = io.BytesIO()
-    writer.write(result)
-    return result.getvalue()
 
 
 SUPPLEMENT = pdf(

@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import re
 from dataclasses import dataclass
+from typing import Any
 
 from pypdf import PdfReader
 from pypdf.errors import PyPdfError
@@ -13,6 +14,8 @@ from .bulletin import AREA_CODE, text_of
 from .geometry import Point, closed, coordinates
 
 HEIGHT = re.compile(r"\b(?:UNL|SFC|GND|FL ?\d+|\d+ ?FT (?:MSL|AMSL|AGL)|\d+ ?M (?:MSL|AMSL|AGL))\b")
+FLIGHT_LEVEL = re.compile(r"FL ?(\d+)")
+ALTITUDE = re.compile(r"(\d+) ?(FT|M) (MSL|AMSL|AGL)")
 NAME = r"[A-ZÅÄÖ][A-ZÅÄÖ0-9 ./()'-]*?"
 # EFR100 has no name, nor do the parts used only for flight plan validation (EFR122AZ). The heights are in a table
 # nested in the row, so the page is read as text and each area runs up to the next one.
@@ -32,6 +35,39 @@ class Area:
     # Heights as given ("FL 240", "SFC", "4000 FT MSL").
     upper: str | None
     lower: str | None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "code": self.code,
+            "name": self.name,
+            "ring": self.ring,
+            "along_border": self.along_border,
+            "upper": self.upper,
+            "lower": self.lower,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Area:
+        return cls(
+            code=data["code"],
+            name=data["name"],
+            ring=[(lat, lon) for lat, lon in data["ring"]],
+            along_border=data["along_border"],
+            upper=data["upper"],
+            lower=data["lower"],
+        )
+
+
+def height(text: str) -> str:
+    """A height in one form, as the NOTAMs and the AIP write the same one differently: "FL070" and "FL 70" are "FL 70",
+    "1600FT AMSL" and "1600 FT MSL" are "1600 ft MSL". Anything else as given.
+    """
+    text = " ".join(text.split())
+    if m := FLIGHT_LEVEL.fullmatch(text):
+        return f"FL {int(m[1])}"
+    if m := ALTITUDE.fullmatch(text):
+        return f"{int(m[1])} {m[2].lower()} {'AGL' if m[3] == 'AGL' else 'MSL'}"
+    return text
 
 
 def parse_enr_5_1(page: str) -> dict[str, Area]:

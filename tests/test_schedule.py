@@ -209,13 +209,6 @@ def test_the_last_window_is_cut_at_to() -> None:
         (at(2, "0600", 11), at(2, "1500", 11), "0600-1200 1200-1500", [(at(2, "0600", 11), at(2, "1500", 11))]),
         # Across midnight, into the next day's window.
         (at(2, "2200", 11), at(3, "0500", 11), "2200-0400, 0300-0500", [(at(2, "2200", 11), at(3, "0500", 11))]),
-        # A minute apart is not touching.
-        (
-            at(2, "1800", 11),
-            at(3, "0600", 11),
-            "2 1800-2359, 3 0000-0600",
-            [(at(2, "1800", 11), at(2, "2359", 11)), (at(3, "0000", 11), at(3, "0600", 11))],
-        ),
         # Touching at midnight.
         (at(2, "1800", 11), at(3, "0600", 11), "2 1800-2400, 3 0000-0600", [(at(2, "1800", 11), at(3, "0600", 11))]),
         # Cut at TO, then merged.
@@ -249,6 +242,35 @@ def test_the_last_window_is_cut_at_to() -> None:
     ],
 )
 def test_windows_that_overlap_or_touch_merge(start: datetime, end: datetime, schedule: str, windows: list) -> None:
+    assert schedule_windows(start, end, schedule) == windows
+
+
+@pytest.mark.parametrize(
+    ("start", "end", "schedule", "windows"),
+    [
+        # Closing at 2359 is closing at midnight, so the next day's window starting at 0000 joins it.
+        (at(2, "1800", 11), at(3, "0600", 11), "2 1800-2359, 3 0000-0600", [(at(2, "1800", 11), at(3, "0600", 11))]),
+        # Every day, with TO at 23:59 on the last: the last window is still cut at TO.
+        (
+            at(2, "1800", 11),
+            at(3, "2359", 11),
+            "1800-2359",
+            [(at(2, "1800", 11), at(3, "0000", 11)), (at(3, "1800", 11), at(3, "2359", 11))],
+        ),
+        # The whole day, every day: one window.
+        (at(2, "0000", 11), at(4, "2359", 11), "0000-2359", [(at(2, "0000", 11), at(4, "2359", 11))]),
+        # A minute earlier is a minute earlier.
+        (
+            at(2, "1800", 11),
+            at(3, "0600", 11),
+            "2 1800-2358, 3 0000-0600",
+            [(at(2, "1800", 11), at(2, "2358", 11)), (at(3, "0000", 11), at(3, "0600", 11))],
+        ),
+        # Opening at 2359 is opening at 23:59.
+        (at(2, "2359", 11), at(3, "0100", 11), "2359-0100", [(at(2, "2359", 11), at(3, "0100", 11))]),
+    ],
+)
+def test_closing_at_2359_is_closing_at_midnight(start: datetime, end: datetime, schedule: str, windows: list) -> None:
     assert schedule_windows(start, end, schedule) == windows
 
 

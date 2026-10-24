@@ -115,7 +115,9 @@ def parse_group(group: str) -> tuple[set[int], set[int], list[tuple[timedelta, t
         h1, m1, h2, m2 = (int(part) for part in SPAN.fullmatch(token).groups())
         if m1 > 59 or m2 > 59 or h1 * 60 + m1 > 1440 or h2 * 60 + m2 > 1440:
             return None
-        spans.append((timedelta(hours=h1, minutes=m1), timedelta(hours=h2, minutes=m2)))
+        # A span closing at 2359 means the end of the day, so "21 1800-2359, 22 0000-0600" leaves no gap at 23:59.
+        closes = timedelta(days=1) if (h2, m2) == (23, 59) else timedelta(hours=h2, minutes=m2)
+        spans.append((timedelta(hours=h1, minutes=m1), closes))
     return days, weekdays, spans
 
 
