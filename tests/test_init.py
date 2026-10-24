@@ -108,6 +108,11 @@ async def test_the_feed_after_the_first_poll(enable_custom_integrations, hass: H
     features = state.attributes["geojson"]["features"]
     assert [feature["id"] for feature in features] == ["area:EFR901", "area:EFD905A", "area:EFR1901"]
     assert features[1]["properties"]["notams"][0]["upper"] == "FL 70"
+    # In English, the language of the test's Home Assistant.
+    assert [entry["label"] for entry in state.attributes["legend"]] == ["Prohibited area", "Restricted area", "Danger area"]
+    assert state.attributes["list"]["count"] == "areas"
+    assert features[2]["properties"]["list"]["tag"] == {"text": "NEW", "tone": "warning"}
+    assert features[0]["properties"]["name"] == "Honkaniemi"
     assert state.attributes["not_found"] == [{"notam": "A9003/26", "codes": ["EFR999"]}]
     assert (state.attributes["without_act"], state.attributes["failed"], state.attributes["missed"]) == ([], [], [])
     # 10:30 is the next update.

@@ -9,8 +9,9 @@ import pytest
 from custom_components.finnish_airspace.aip import Area, height
 from custom_components.finnish_airspace.bulletin import AreaType, Bulletin, Notam, Supplement
 from custom_components.finnish_airspace.coordinator import next_poll
-from custom_components.finnish_airspace.feed import Item, airspace, event_data, feature, news
+from custom_components.finnish_airspace.feed import Item, airspace, event_data, news
 from custom_components.finnish_airspace.geometry import distance_km
+from custom_components.finnish_airspace.map_feed import notam_data
 
 NOW = datetime(2026, 11, 2, 10, 0, tzinfo=UTC)
 HOME = (65.0, 25.5)
@@ -164,7 +165,6 @@ def test_a_new_area_without_a_code_is_keyed_on_its_notam() -> None:
 
     assert item.key == "notam:A9005/26"
     assert item.codes == []
-    assert feature(item)["properties"]["name"] == "A9005/26"
 
 
 @pytest.mark.parametrize(
@@ -294,7 +294,7 @@ def test_a_period_ending_at_2359_ends_at_midnight(
     (item,) = items(*notams, now=now)
 
     assert (item.active, item.active_until, item.next_start) == (active, active_until, next_start)
-    listed = feature(item)["properties"]["notams"]
+    listed = [notam_data(activation) for activation in item.activations]
     # The NOTAMs' own times stay as published, for those not yet ended.
     assert {notam.get("end") for notam in listed} <= {end.isoformat() if end else None for _, end, _ in periods}
     # The windows in one form, whether a span or TO closes at 23:59.
@@ -431,34 +431,6 @@ def test_the_event_from_the_first_notam() -> None:
         "active": True,
         "distance_km": item.distance_km,
     }
-
-
-def test_a_feature() -> None:
-    (item,) = items(notam("EFR901 EFR902 ACT", schedule="0900-1500", start=NOW - timedelta(hours=1)))
-
-    result = feature(item)
-
-    assert result["id"] == "area:EFR901,EFR902"
-    assert result["geometry"]["type"] == "MultiPolygon"
-    assert result["geometry"]["coordinates"][0] == [[[26.0, 65.5], [26.2, 65.5], [26.2, 65.4], [26.0, 65.4], [26.0, 65.5]]]
-    properties = result["properties"]
-    assert properties["name"] == "EFR901 EFR902 HONKANIEMI LEHTOVAARA"
-    assert properties["kind"] == "air.area"
-    assert properties["active_until"] == "2026-11-02T15:00:00+00:00"
-    # No nulls: a property without a value is left out.
-    assert "next_start" not in properties
-    assert properties["notams"] == [
-        {
-            "id": "A9001/26",
-            "text": "EFR901 EFR902 ACT",
-            "start": "2026-11-02T09:00:00+00:00",
-            "end": "2026-11-02T15:00:00+00:00",
-            "schedule": "0900-1500",
-            "lower": "SFC",
-            "upper": "FL 95",
-            "windows": [["2026-11-02T09:00:00+00:00", "2026-11-02T15:00:00+00:00"]],
-        }
-    ]
 
 
 def at(hhmm: str, day: int = 2) -> datetime:

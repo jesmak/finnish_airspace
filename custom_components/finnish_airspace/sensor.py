@@ -10,10 +10,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from .const import ATTRIBUTION, DOMAIN, MAP_FEED_VERSION, TITLE
 from .coordinator import AirspaceConfigEntry, AirspaceCoordinator
-from .feed import feature
+from .map_feed import feature, feed_attributes, language_of
 
 
 async def async_setup_entry(
@@ -52,11 +53,15 @@ class MapFeedSensor(CoordinatorEntity[AirspaceCoordinator], SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         data = self.coordinator.data
+        language = language_of(self.hass.config.language)
+        zone = dt_util.get_default_time_zone()
+        features = [feature(item, language, data.updated, zone) for item in data.items if item.in_feed]
         return {
             "map_feed_version": MAP_FEED_VERSION,
             "feed_type": "air",
+            **feed_attributes(language),
             "updated": data.updated.isoformat(timespec="seconds"),
-            "geojson": {"type": "FeatureCollection", "features": [feature(item) for item in data.items if item.in_feed]},
+            "geojson": {"type": "FeatureCollection", "features": features},
             # So a mismatch shows instead of vanishing.
             "not_found": [{"notam": notam.id, "codes": codes} for notam, codes in data.not_found],
             "without_act": [{"notam": notam.id, "codes": notam.codes, "text": notam.text} for notam in data.without_act],
