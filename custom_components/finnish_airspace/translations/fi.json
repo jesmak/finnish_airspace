@@ -1,0 +1,10 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Finnish Airspace",
+        "description": "Suomen ilmatilan voimassa olevat rajoitukset Fintraffic ANS:n julkaisemista NOTAM-tiedotteista."
+      }
+    }
+  }
+}

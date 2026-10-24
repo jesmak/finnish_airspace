@@ -1,0 +1,10 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Finnish Airspace",
+        "description": "The airspace restrictions in force in Finland, from the NOTAMs published by Fintraffic ANS."
+      }
+    }
+  }
+}
