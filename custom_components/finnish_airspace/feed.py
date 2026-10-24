@@ -13,7 +13,8 @@ from .schedule import Window, merged, schedule_windows
 
 # The feed shows the areas in force, and those starting within this.
 AHEAD = timedelta(hours=24)
-# An area is remembered this long after its last NOTAM ends, so one issued again under a new id is not news.
+# An area is remembered this long after its last NOTAM ends, so one issued again under a new id is not news. An area
+# without a code is known by its NOTAM's id, so one replacing it is.
 REMEMBER = timedelta(days=7)
 # The areas whose appearance is news. Danger areas are most of the NOTAMs (shooting, flares, drones), every week.
 NEWS = (AreaType.RESTRICTED, AreaType.PROHIBITED)

@@ -1,0 +1,1239 @@
+{
+    "resources": ["../../hass-cards/map-feed-card/dist/map-feed-card.js"],
+    "clock": "2026-06-12T14:20:00+03:00",
+    "states": {
+        "sensor.aircraft_near_tampere": {
+            "state": "10",
+            "attributes": {
+                "friendly_name": "Aircraft near Tampere",
+                "icon": "mdi:airplane",
+                "attribution": "adsb.fi",
+                "attribution_url": "https://adsb.fi/",
+                "map_feed_version": 1,
+                "feed_type": "air",
+                "area": {
+                    "center": [61.4978, 23.761],
+                    "radius_km": 100
+                },
+                "updated": "2026-06-12T14:20:00+03:00",
+                "list": {
+                    "sort": [
+                        {
+                            "key": "distance",
+                            "label": "Distance",
+                            "property": "distance_km"
+                        },
+                        {
+                            "key": "altitude",
+                            "label": "Altitude",
+                            "property": "altitude_ft",
+                            "order": "desc"
+                        }
+                    ],
+                    "default": "distance",
+                    "count": "aircraft",
+                    "count_one": "aircraft"
+                },
+                "legend": [
+                    {
+                        "color": "#4d4d4d",
+                        "label": "On the ground"
+                    },
+                    {
+                        "color": "#f07719",
+                        "label": "300 m"
+                    },
+                    {
+                        "color": "#f0a61a",
+                        "label": "1 km"
+                    },
+                    {
+                        "color": "#d0cc0d",
+                        "label": "2 km"
+                    },
+                    {
+                        "color": "#31c50d",
+                        "label": "3 km"
+                    },
+                    {
+                        "color": "#0db5cf",
+                        "label": "6 km"
+                    },
+                    {
+                        "color": "#3b34f2",
+                        "label": "9 km"
+                    },
+                    {
+                        "color": "#c90ed5",
+                        "label": "12 km"
+                    }
+                ],
+                "geojson": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:46a1c4",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [23.7, 61.43]
+                            },
+                            "properties": {
+                                "name": "EXA481",
+                                "kind": "air.large",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 228,
+                                "speed_kmh": 296,
+                                "subtitle": "EMBRAER ERJ-190-100 · Example Air",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "730 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "descending 3.9 m/s"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZD"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "E190"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "8.2 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "ADS-B"
+                                    }
+                                ],
+                                "color": "#f1981f",
+                                "footer": "ICAO 46A1C4 · A3",
+                                "list": {
+                                    "value": "730 m"
+                                },
+                                "distance_km": 8.2,
+                                "altitude_ft": 2400
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:46a1c4/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [24.04509, 61.5786],
+                                    [23.7, 61.43]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.large",
+                                "point": "aircraft:46a1c4"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:462000",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [23.6038, 61.4155]
+                            },
+                            "properties": {
+                                "name": "EXA456",
+                                "kind": "air.large",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 180,
+                                "stationary": true,
+                                "speed_kmh": 22,
+                                "subtitle": "AIRBUS A-321 · Example Air",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "on the ground"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "2000"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZC"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "A321"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "12.4 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "ADS-B"
+                                    }
+                                ],
+                                "color": "#4d4d4d",
+                                "footer": "ICAO 462000 · A3",
+                                "list": {
+                                    "value": "on the ground"
+                                },
+                                "distance_km": 12.4,
+                                "altitude_ft": 0
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:461f00",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [23.3, 61.6]
+                            },
+                            "properties": {
+                                "name": "OH-ZZB",
+                                "kind": "air.light",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 270,
+                                "speed_kmh": 176,
+                                "subtitle": "CESSNA 172 Skyhawk",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "760 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "level"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZB"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "C172"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "26.9 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "MLAT"
+                                    }
+                                ],
+                                "color": "#f19a1f",
+                                "footer": "ICAO 461F00 · A1",
+                                "list": {
+                                    "value": "760 m"
+                                },
+                                "distance_km": 26.9,
+                                "altitude_ft": 2500
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:461f00/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [23.57723, 61.6],
+                                    [23.3, 61.6]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.light",
+                                "point": "aircraft:461f00"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:46a1d7",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [23.31, 61.71]
+                            },
+                            "properties": {
+                                "name": "EXA77",
+                                "kind": "air.turboprop",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 31,
+                                "speed_kmh": 454,
+                                "subtitle": "ATR-72-500 · Example Air",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "2,990 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "climbing 5.2 m/s"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZE"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "AT75"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "33.5 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "ADS-B"
+                                    }
+                                ],
+                                "color": "#34c50d",
+                                "footer": "ICAO 46A1D7 · A2",
+                                "list": {
+                                    "value": "2,990 m"
+                                },
+                                "distance_km": 33.5,
+                                "altitude_ft": 9800
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:46a1d7/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [22.94046, 61.41852],
+                                    [23.31, 61.71]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.turboprop",
+                                "point": "aircraft:46a1d7"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:461f10",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [24.25, 61.3]
+                            },
+                            "properties": {
+                                "name": "OHZZH",
+                                "kind": "air.rotorcraft",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 138,
+                                "speed_kmh": 204,
+                                "subtitle": "AIRBUS HELICOPTERS EC-135/635",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "370 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "climbing 1.0 m/s"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZH"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "EC35"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "34.1 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "ADS-B"
+                                    }
+                                ],
+                                "color": "#f07d1b",
+                                "footer": "ICAO 461F10 · A7",
+                                "list": {
+                                    "value": "370 m"
+                                },
+                                "distance_km": 34.1,
+                                "altitude_ft": 1200
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:461f10/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [24.03727, 61.41346],
+                                    [24.25, 61.3]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.rotorcraft",
+                                "point": "aircraft:461f10"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:461f20",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [23.85, 61.86]
+                            },
+                            "properties": {
+                                "name": "OH-ZZG",
+                                "kind": "air.glider",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 302,
+                                "speed_kmh": 89,
+                                "subtitle": "Glider",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "1,310 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "climbing 1.6 m/s"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZG"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "GLID"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "40.5 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "MLAT"
+                                    }
+                                ],
+                                "color": "#f0b815",
+                                "footer": "ICAO 461F20 · B1",
+                                "list": {
+                                    "value": "1,310 m"
+                                },
+                                "distance_km": 40.5,
+                                "altitude_ft": 4300
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:461f20/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [23.96979, 61.8247],
+                                    [23.85, 61.86]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.glider",
+                                "point": "aircraft:461f20"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:4ca8e1",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [24.58, 61.24]
+                            },
+                            "properties": {
+                                "name": "EXD905",
+                                "kind": "air.large",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 323,
+                                "speed_kmh": 719,
+                                "subtitle": "BOEING 737-800 · Example Low Cost",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "6,710 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "climbing 11.4 m/s"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "EI-ZZF"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "B738"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "52.2 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "adsb.fi"
+                                    }
+                                ],
+                                "color": "#36b1f2",
+                                "footer": "ICAO 4CA8E1 · A3",
+                                "list": {
+                                    "value": "6,710 m"
+                                },
+                                "distance_km": 52.2,
+                                "altitude_ft": 22000
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:4ca8e1/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [25.25359, 60.80991],
+                                    [24.58, 61.24]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.large",
+                                "point": "aircraft:4ca8e1"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:46a1b2",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [24.75, 61.8]
+                            },
+                            "properties": {
+                                "name": "EXA123",
+                                "kind": "air.large",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 112,
+                                "speed_kmh": 837,
+                                "subtitle": "AIRBUS A-320 · Example Air",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "10,970 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "level"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "OH-ZZA"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "A320"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "62.1 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "adsb.fi"
+                                    }
+                                ],
+                                "color": "#ad36f2",
+                                "footer": "ICAO 46A1B2 · A3",
+                                "list": {
+                                    "value": "10,970 m"
+                                },
+                                "distance_km": 62.1,
+                                "altitude_ft": 36000
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:46a1b2/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [23.51908, 62.03501],
+                                    [24.75, 61.8]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.large",
+                                "point": "aircraft:46a1b2"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:3c64a8",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [23.11, 60.98]
+                            },
+                            "properties": {
+                                "name": "EXC4417",
+                                "kind": "air.large",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 196,
+                                "speed_kmh": 817,
+                                "subtitle": "BOEING 737 MAX 8 · Example Charter",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "9,450 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "descending 7.5 m/s"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "D-ZZMA"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "B38M"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "67.3 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "adsb.fi"
+                                    }
+                                ],
+                                "color": "#4e2cf2",
+                                "footer": "ICAO 3C64A8 · A3",
+                                "list": {
+                                    "value": "9,450 m"
+                                },
+                                "distance_km": 67.3,
+                                "altitude_ft": 31000
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:3c64a8/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [23.45778, 61.56838],
+                                    [23.11, 60.98]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.large",
+                                "point": "aircraft:3c64a8"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:4b19f2",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [24.95, 62.1]
+                            },
+                            "properties": {
+                                "name": "EXB2081",
+                                "kind": "air.heavy",
+                                "updated": "2026-06-12T11:20:00+00:00",
+                                "heading": 68,
+                                "speed_kmh": 885,
+                                "subtitle": "AIRBUS A-330-300 · Example Airways",
+                                "details": [
+                                    {
+                                        "label": "Altitude",
+                                        "value": "11,890 m"
+                                    },
+                                    {
+                                        "label": "Vertical rate",
+                                        "value": "level"
+                                    },
+                                    {
+                                        "label": "Squawk",
+                                        "value": "6211"
+                                    },
+                                    {
+                                        "label": "Registration",
+                                        "value": "HB-ZZK"
+                                    },
+                                    {
+                                        "label": "Type",
+                                        "value": "A333"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "91.6 km"
+                                    },
+                                    {
+                                        "label": "Source",
+                                        "value": "adsb.fi"
+                                    }
+                                ],
+                                "color": "#c60ed9",
+                                "footer": "ICAO 4B19F2 · A5",
+                                "list": {
+                                    "value": "11,890 m"
+                                },
+                                "distance_km": 91.6,
+                                "altitude_ft": 39000
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "aircraft:4b19f2/trail",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [
+                                    [23.63542, 61.85147],
+                                    [24.95, 62.1]
+                                ]
+                            },
+                            "properties": {
+                                "kind": "air.heavy",
+                                "point": "aircraft:4b19f2"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "sensor.finnish_airspace": {
+            "state": "4",
+            "attributes": {
+                "friendly_name": "Finnish Airspace",
+                "icon": "mdi:airplane-alert",
+                "attribution": "Fintraffic ANS, ais.fi",
+                "map_feed_version": 1,
+                "feed_type": "air",
+                "legend": [
+                    {
+                        "color": "#e03131",
+                        "label": "Prohibited area"
+                    },
+                    {
+                        "color": "#d4603f",
+                        "label": "Restricted area"
+                    },
+                    {
+                        "color": "#8f9aab",
+                        "label": "Danger area"
+                    }
+                ],
+                "list": {
+                    "sort": [
+                        {
+                            "key": "distance",
+                            "label": "Distance",
+                            "property": "distance_km"
+                        }
+                    ],
+                    "default": "distance",
+                    "count": "areas",
+                    "count_one": "area"
+                },
+                "updated": "2026-06-12T11:20:00+00:00",
+                "geojson": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "id": "area:EFR1901",
+                            "geometry": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [24.75, 61.59492],
+                                            [24.75924, 61.5947],
+                                            [24.76839, 61.59405],
+                                            [24.77737, 61.59298],
+                                            [24.78608, 61.5915],
+                                            [24.79444, 61.58961],
+                                            [24.80238, 61.58735],
+                                            [24.80981, 61.58472],
+                                            [24.81667, 61.58176],
+                                            [24.82288, 61.57849],
+                                            [24.82839, 61.57495],
+                                            [24.83315, 61.57117],
+                                            [24.83711, 61.56719],
+                                            [24.84022, 61.56304],
+                                            [24.84247, 61.55876],
+                                            [24.84383, 61.5544],
+                                            [24.84428, 61.55],
+                                            [24.84383, 61.5456],
+                                            [24.84247, 61.54124],
+                                            [24.84022, 61.53696],
+                                            [24.83711, 61.53281],
+                                            [24.83315, 61.52883],
+                                            [24.82839, 61.52505],
+                                            [24.82288, 61.52151],
+                                            [24.81667, 61.51824],
+                                            [24.80981, 61.51528],
+                                            [24.80238, 61.51265],
+                                            [24.79444, 61.51039],
+                                            [24.78608, 61.5085],
+                                            [24.77737, 61.50702],
+                                            [24.76839, 61.50595],
+                                            [24.75924, 61.5053],
+                                            [24.75, 61.50508],
+                                            [24.74076, 61.5053],
+                                            [24.73161, 61.50595],
+                                            [24.72263, 61.50702],
+                                            [24.71392, 61.5085],
+                                            [24.70556, 61.51039],
+                                            [24.69762, 61.51265],
+                                            [24.69019, 61.51528],
+                                            [24.68333, 61.51824],
+                                            [24.67712, 61.52151],
+                                            [24.67161, 61.52505],
+                                            [24.66685, 61.52883],
+                                            [24.66289, 61.53281],
+                                            [24.65978, 61.53696],
+                                            [24.65753, 61.54124],
+                                            [24.65617, 61.5456],
+                                            [24.65572, 61.55],
+                                            [24.65617, 61.5544],
+                                            [24.65753, 61.55876],
+                                            [24.65978, 61.56304],
+                                            [24.66289, 61.56719],
+                                            [24.66685, 61.57117],
+                                            [24.67161, 61.57495],
+                                            [24.67712, 61.57849],
+                                            [24.68333, 61.58176],
+                                            [24.69019, 61.58472],
+                                            [24.69762, 61.58735],
+                                            [24.70556, 61.58961],
+                                            [24.71392, 61.5915],
+                                            [24.72263, 61.59298],
+                                            [24.73161, 61.59405],
+                                            [24.74076, 61.5947],
+                                            [24.75, 61.59492]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "properties": {
+                                "name": "Restricted area EFR1901",
+                                "kind": "air.area",
+                                "subtitle": "Restricted area",
+                                "color": "#d4603f",
+                                "list": {
+                                    "title": "Restricted area EFR1901",
+                                    "text": "in force until 18:00",
+                                    "value": "48 km",
+                                    "tag": {
+                                        "text": "NEW",
+                                        "tone": "warning"
+                                    }
+                                },
+                                "details": [
+                                    {
+                                        "label": "Heights",
+                                        "value": "SFC – 2000 ft MSL (610 m)"
+                                    },
+                                    {
+                                        "label": "Period",
+                                        "value": "12 Jun 12:30 – 12 Jun 18:00 (estimated)"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "47.8 km"
+                                    }
+                                ],
+                                "notices": [
+                                    "TEMPO RESTRICTED AREA EFR1901 ESTABLISHED AND ACT. PSN 613300N 0244500E, RADIUS 5KM. AIRSPACE RESTRICTION DUE TO A RESCUE OPERATION."
+                                ],
+                                "footer": "NOTAM A2101/26",
+                                "link": {
+                                    "url": "https://www.ais.fi/en/pre-flight-information-bulletins",
+                                    "label": "NOTAM bulletin on ais.fi"
+                                },
+                                "area_type": "restricted",
+                                "codes": ["EFR1901"],
+                                "new_area": true,
+                                "active": true,
+                                "active_until": "2026-06-12T15:00:00+00:00",
+                                "distance_km": 47.8,
+                                "notams": [
+                                    {
+                                        "id": "A2101/26",
+                                        "text": "TEMPO RESTRICTED AREA EFR1901 ESTABLISHED AND ACT. PSN 613300N 0244500E, RADIUS 5KM. AIRSPACE RESTRICTION DUE TO A RESCUE OPERATION.",
+                                        "start": "2026-06-12T09:30:00+00:00",
+                                        "end": "2026-06-12T15:00:00+00:00",
+                                        "estimated": true,
+                                        "lower": "SFC",
+                                        "upper": "2000 ft MSL"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "area:EFD956A,EFD956B",
+                            "geometry": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [22.98, 61.36],
+                                            [23.18, 61.36],
+                                            [23.18, 61.27],
+                                            [22.98, 61.27],
+                                            [22.98, 61.36]
+                                        ]
+                                    ],
+                                    [
+                                        [
+                                            [22.98, 61.27],
+                                            [23.18, 61.27],
+                                            [23.1, 61.2],
+                                            [22.98, 61.27]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "properties": {
+                                "name": "Korpivaara",
+                                "kind": "air.area",
+                                "subtitle": "Danger area",
+                                "color": "#8f9aab",
+                                "list": {
+                                    "title": "Korpivaara",
+                                    "text": "EFD956A, EFD956B · in force until 18:00",
+                                    "value": "34 km"
+                                },
+                                "details": [
+                                    {
+                                        "label": "Heights",
+                                        "value": "SFC – FL 70 (approx. 2,100 m)"
+                                    },
+                                    {
+                                        "label": "Period",
+                                        "value": "8 Jun 09:00 – 12 Jun 18:00"
+                                    },
+                                    {
+                                        "label": "Schedule",
+                                        "value": "Fri 09:00–18:00"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "34.5 km"
+                                    }
+                                ],
+                                "notices": [
+                                    "TEMPO DANGER AREA EFD956A EFD956B KORPIVAARA ACT. LIVE FIRING. REF AIP SUP 077/2026"
+                                ],
+                                "footer": "NOTAM A2087/26 · AIP SUP 077/2026",
+                                "link": {
+                                    "url": "https://www.ais.fi/aipsup/Sup/S2026/EF_SUP_2026_077_en.pdf",
+                                    "label": "AIP SUP 077/2026 on ais.fi"
+                                },
+                                "area_type": "danger",
+                                "codes": ["EFD956A", "EFD956B"],
+                                "new_area": false,
+                                "active": true,
+                                "active_until": "2026-06-12T15:00:00+00:00",
+                                "distance_km": 34.5,
+                                "notams": [
+                                    {
+                                        "id": "A2087/26",
+                                        "text": "TEMPO DANGER AREA EFD956A EFD956B KORPIVAARA ACT. LIVE FIRING. REF AIP SUP 077/2026",
+                                        "start": "2026-06-08T06:00:00+00:00",
+                                        "end": "2026-06-12T15:00:00+00:00",
+                                        "schedule": "0600-1500",
+                                        "lower": "SFC",
+                                        "upper": "FL 70",
+                                        "windows": [
+                                            [
+                                                "2026-06-08T06:00:00+00:00",
+                                                "2026-06-08T15:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-09T06:00:00+00:00",
+                                                "2026-06-09T15:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-10T06:00:00+00:00",
+                                                "2026-06-10T15:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-11T06:00:00+00:00",
+                                                "2026-06-11T15:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-12T06:00:00+00:00",
+                                                "2026-06-12T15:00:00+00:00"
+                                            ]
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "area:EFD958",
+                            "geometry": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [24.42, 61.2],
+                                            [24.62, 61.24],
+                                            [24.7, 61.12],
+                                            [24.48, 61.08],
+                                            [24.42, 61.2]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "properties": {
+                                "name": "Saarenmaa",
+                                "kind": "air.area",
+                                "subtitle": "Danger area",
+                                "color": "#8f9aab",
+                                "list": {
+                                    "title": "Saarenmaa",
+                                    "text": "EFD958 · in force until 17:00",
+                                    "value": "48 km"
+                                },
+                                "details": [
+                                    {
+                                        "label": "Heights",
+                                        "value": "SFC – 3000 ft MSL (910 m)"
+                                    },
+                                    {
+                                        "label": "Period",
+                                        "value": "8 Jun 10:00 – 19 Jun 17:00"
+                                    },
+                                    {
+                                        "label": "Schedule",
+                                        "value": "Fri 10:00–17:00, Mon 10:00–17:00, Tue 10:00–17:00, …"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "48.2 km"
+                                    }
+                                ],
+                                "notices": ["EFD958 SAARENMAA ACT. BLASTING"],
+                                "footer": "NOTAM A2093/26",
+                                "link": {
+                                    "url": "https://www.ais.fi/en/pre-flight-information-bulletins",
+                                    "label": "NOTAM bulletin on ais.fi"
+                                },
+                                "area_type": "danger",
+                                "codes": ["EFD958"],
+                                "new_area": false,
+                                "active": true,
+                                "active_until": "2026-06-12T14:00:00+00:00",
+                                "distance_km": 48.2,
+                                "notams": [
+                                    {
+                                        "id": "A2093/26",
+                                        "text": "EFD958 SAARENMAA ACT. BLASTING",
+                                        "start": "2026-06-08T07:00:00+00:00",
+                                        "end": "2026-06-19T14:00:00+00:00",
+                                        "schedule": "MON-FRI 0700-1400",
+                                        "lower": "SFC",
+                                        "upper": "3000 ft MSL",
+                                        "windows": [
+                                            [
+                                                "2026-06-08T07:00:00+00:00",
+                                                "2026-06-08T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-09T07:00:00+00:00",
+                                                "2026-06-09T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-10T07:00:00+00:00",
+                                                "2026-06-10T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-11T07:00:00+00:00",
+                                                "2026-06-11T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-12T07:00:00+00:00",
+                                                "2026-06-12T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-15T07:00:00+00:00",
+                                                "2026-06-15T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-16T07:00:00+00:00",
+                                                "2026-06-16T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-17T07:00:00+00:00",
+                                                "2026-06-17T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-18T07:00:00+00:00",
+                                                "2026-06-18T14:00:00+00:00"
+                                            ],
+                                            [
+                                                "2026-06-19T07:00:00+00:00",
+                                                "2026-06-19T14:00:00+00:00"
+                                            ]
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "area:EFR951",
+                            "geometry": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [23.3, 61.93],
+                                            [23.62, 61.93],
+                                            [23.7, 61.8],
+                                            [23.36, 61.76],
+                                            [23.3, 61.93]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "properties": {
+                                "name": "Honkaniemi",
+                                "kind": "air.area",
+                                "subtitle": "Restricted area",
+                                "color": "#d4603f",
+                                "opacity": 0.45,
+                                "list": {
+                                    "title": "Honkaniemi",
+                                    "text": "EFR951 · starts Sat 09:00",
+                                    "value": "33 km"
+                                },
+                                "details": [
+                                    {
+                                        "label": "Heights",
+                                        "value": "SFC – FL 95 (approx. 2,900 m)"
+                                    },
+                                    {
+                                        "label": "Period",
+                                        "value": "13 Jun 09:00 – 13 Jun 19:00"
+                                    },
+                                    {
+                                        "label": "Distance",
+                                        "value": "33.4 km"
+                                    }
+                                ],
+                                "notices": [
+                                    "EFR951 HONKANIEMI ACT. FLARES IN USE"
+                                ],
+                                "footer": "NOTAM A2110/26",
+                                "link": {
+                                    "url": "https://www.ais.fi/en/pre-flight-information-bulletins",
+                                    "label": "NOTAM bulletin on ais.fi"
+                                },
+                                "area_type": "restricted",
+                                "codes": ["EFR951"],
+                                "new_area": false,
+                                "active": false,
+                                "next_start": "2026-06-13T06:00:00+00:00",
+                                "distance_km": 33.4,
+                                "notams": [
+                                    {
+                                        "id": "A2110/26",
+                                        "text": "EFR951 HONKANIEMI ACT. FLARES IN USE",
+                                        "start": "2026-06-13T06:00:00+00:00",
+                                        "end": "2026-06-13T16:00:00+00:00",
+                                        "lower": "SFC",
+                                        "upper": "FL 95"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "not_found": [],
+                "without_act": [],
+                "failed": [],
+                "missed": []
+            }
+        }
+    },
+    "shots": [
+        {
+            "name": "dashboard",
+            "width": 1280,
+            "row": "Restricted area EFR1901",
+            "view": {
+                "type": "sections",
+                "max_columns": 3,
+                "sections": [
+                    {
+                        "type": "grid",
+                        "column_span": 3,
+                        "cards": [
+                            {
+                                "type": "custom:map-feed-card",
+                                "map_height": 560,
+                                "list": true,
+                                "grid_options": {
+                                    "columns": "full"
+                                },
+                                "entities": [
+                                    {
+                                        "entity": "sensor.aircraft_near_tampere",
+                                        "show_area": true,
+                                        "labels": true
+                                    },
+                                    {
+                                        "entity": "sensor.finnish_airspace",
+                                        "frame": false
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}
