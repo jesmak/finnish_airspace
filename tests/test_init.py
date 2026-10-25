@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta
 
+import aiohttp
 import pytest
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.const import EVENT_HOMEASSISTANT_FINAL_WRITE, STATE_UNAVAILABLE
@@ -311,6 +312,34 @@ async def test_a_failing_source_warns_once_until_it_works_again(
     assert warnings() == 3
 
 
+@pytest.mark.parametrize("error", [TimeoutError(), aiohttp.ClientConnectionError("Connection refused")], ids=["timeout", "message"])
+@pytest.mark.parametrize(
+    ("source", "said"),
+    [
+        (BULLETIN_URL, "Couldn't read the NOTAM bulletin"),
+        (ENR_5_1_URL, "Couldn't read ENR 5.1, areas named by code are missing until it can be"),
+        (SUPPLEMENT, "Couldn't read AIP SUP 077/2026, the areas it has are missing until it can be"),
+    ],
+    ids=["bulletin", "enr", "supplement"],
+)
+async def test_an_error_without_a_message_is_named(
+    enable_custom_integrations,
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    caplog: pytest.LogCaptureFixture,
+    source: str,
+    said: str,
+    error: Exception,
+) -> None:
+    # The first answer that matches is used, so the failing source goes before the others.
+    aioclient_mock.get(source, exc=error)
+    aioclient_mock.get(BULLETIN_URL, text=page(DANGER, next_update="1030"))
+    aioclient_mock.get(ENR_5_1_URL, text=ENR_5_1)
+    aioclient_mock.get(SUPPLEMENT, content=SUPPLEMENT_PDF)
+    await set_up(hass)
+    assert f"{said}: {str(error) or 'TimeoutError'}\n" in caplog.text
+
+
 async def test_unavailable_when_the_bulletin_cant_be_read(
     enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
@@ -345,3 +374,13 @@ async def test_without_enr_5_1_its_areas_are_not_found(
     answer(aioclient_mock, RESTRICTED, DANGER)
     await refresh(hass, entry, freezer)
     assert hass.states.get(ENTITY).state == "2"
+
+
+def test_the_user_agent_names_the_released_version() -> None:
+    import json
+    from pathlib import Path
+
+    from custom_components.finnish_airspace.const import USER_AGENT
+
+    manifest = json.loads(Path("custom_components/finnish_airspace/manifest.json").read_text())
+    assert USER_AGENT.startswith(f"FinnishAirspace/{manifest['version']} ")

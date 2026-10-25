@@ -8,7 +8,7 @@ TITLE: Final = "Finnish Airspace"
 
 ATTRIBUTION: Final = "Fintraffic ANS, ais.fi"
 
-USER_AGENT: Final = "FinnishAirspace/1.0.0 (https://github.com/jesmak/finnish_airspace; Home Assistant integration)"
+USER_AGENT: Final = "FinnishAirspace/1.0.1 (https://github.com/jesmak/finnish_airspace; Home Assistant integration)"
 
 # The content of the IFR bulletin for the whole Helsinki FIR, in ISO-8859-1 by its own markup.
 BULLETIN_URL: Final = "https://www.ais.fi/bulletins/efinen.htm"

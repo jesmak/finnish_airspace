@@ -93,7 +93,8 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
         try:
             bulletin = await self._fetch_bulletin()
         except (aiohttp.ClientError, TimeoutError, ValueError) as err:
-            raise UpdateFailed(f"Couldn't read the NOTAM bulletin: {err}") from err
+            # A timeout's message is empty, and the coordinator logs only the first failure, so the type is the cause.
+            raise UpdateFailed(f"Couldn't read the NOTAM bulletin: {str(err) or type(err).__name__}") from err
         await self._refresh_enr(now)
         await self._refresh_supplements(bulletin, now)
 
@@ -158,7 +159,7 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
             areas = await self.hass.async_add_executor_job(parse_enr_5_1, page)
         except (aiohttp.ClientError, TimeoutError, ValueError) as err:
             outcome = "keeping the areas read before" if self.enr else "areas named by code are missing until it can be"
-            self._failed("ENR 5.1", f"Couldn't read ENR 5.1, {outcome}: {err}")
+            self._failed("ENR 5.1", f"Couldn't read ENR 5.1, {outcome}: {str(err) or type(err).__name__}")
             return
         self._worked("ENR 5.1")
         self.enr, self._enr_etag, self._enr_checked = areas, etag, now
@@ -178,7 +179,7 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
                     pdf = await response.read()
                 areas = await self.hass.async_add_executor_job(parse_supplement, pdf)
             except (aiohttp.ClientError, TimeoutError, ValueError) as err:
-                self._failed(name, f"Couldn't read {name}, the areas it has are missing until it can be: {err}")
+                self._failed(name, f"Couldn't read {name}, the areas it has are missing until it can be: {str(err) or type(err).__name__}")
                 continue
             self._worked(name)
             self.supplements[supplement] = areas
