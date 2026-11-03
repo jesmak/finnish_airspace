@@ -1,6 +1,7 @@
 {
   "domain": "finnish_airspace",
   "name": "Finnish Airspace",
+  "categories": ["vehicles_transport.flights"],
   "codeowners": [
     "@jesmak"
   ],
