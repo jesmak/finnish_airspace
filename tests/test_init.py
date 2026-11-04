@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_capture_events
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
-from custom_components.finnish_airspace.const import BULLETIN_URL, DOMAIN, ENR_5_1_URL, EVENT_NEW_RESTRICTION, SUPPLEMENT_URL
+from custom_components.finnish_airspace.const import BULLETIN_URL, DOMAIN, ENR_5_1_URL, EVENT_NEW_RESTRICTION, LATE, SUPPLEMENT_URL
 from custom_components.finnish_airspace.coordinator import AirspaceCoordinator
 
 from .pages import page, pdf, row, table
@@ -322,7 +322,7 @@ async def test_a_failing_source_warns_once_until_it_works_again(
     ],
     ids=["bulletin", "enr", "supplement"],
 )
-async def test_an_error_without_a_message_is_named(
+async def test_a_connection_error_is_named_in_the_log(
     enable_custom_integrations,
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -349,11 +349,13 @@ async def test_unavailable_when_the_bulletin_cant_be_read(
     answer(aioclient_mock, RESTRICTED, bulletin_status=500)
     await refresh(hass, entry, freezer)
     assert hass.states.get(ENTITY).state == STATE_UNAVAILABLE
+    assert entry.runtime_data.update_interval == LATE
 
     # A page without NOTAMs is not an empty sky.
     answer(aioclient_mock)
-    await refresh(hass, entry, freezer)
+    await refresh(hass, entry, freezer, minutes=5)
     assert hass.states.get(ENTITY).state == STATE_UNAVAILABLE
+    assert entry.runtime_data.update_interval == LATE
 
     answer(aioclient_mock, RESTRICTED)
     await refresh(hass, entry, freezer)

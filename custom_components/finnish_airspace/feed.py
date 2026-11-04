@@ -133,8 +133,8 @@ def make_item(
     activations = []
     # A code whose area a NOTAM of the item sets up itself is not looked up in the AIP.
     shaped = {code for notam in notams if notam.kind == Kind.NEW_AREA for code in notam.codes}
-    # The NOTAMs' shapes are pooled, as a code's area is taken to be in one place. On 2026-10-24 no code was both in
-    # ENR 5.1 and in a supplement, and none was named with two supplements.
+    # The NOTAMs' shapes are pooled, as a code's area is taken to be in one place: no code is expected both in ENR 5.1
+    # and in a supplement, nor named with two supplements.
     for notam in notams:
         areas: list[Area] = []
         missing: list[str] = []

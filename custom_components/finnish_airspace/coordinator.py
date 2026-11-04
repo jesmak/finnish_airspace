@@ -93,6 +93,8 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
         try:
             bulletin = await self._fetch_bulletin()
         except (aiohttp.ClientError, TimeoutError, ValueError) as err:
+            # The feed is unavailable until the bulletin is read again, so a passing failure isn't left for half an hour.
+            self.update_interval = LATE
             # A timeout's message is empty, and the coordinator logs only the first failure, so the type is the cause.
             raise UpdateFailed(f"Couldn't read the NOTAM bulletin: {str(err) or type(err).__name__}") from err
         await self._refresh_enr(now)

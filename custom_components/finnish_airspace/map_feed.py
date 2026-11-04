@@ -166,7 +166,8 @@ def notam_data(activation: Activation) -> dict[str, Any]:
 def detail_rows(item: Item, language: str, now: datetime, zone: tzinfo) -> list[dict[str, str]]:
     texts = texts_for(language)
     rows = []
-    first = item.activations[0]
+    # The NOTAM starting first, as in the event, and not the first in the bulletin's order.
+    first = min(item.activations, key=lambda activation: activation.notam.start)
     if first.lower or first.upper:
         heights = f"{with_metres(first.lower, language)} – {with_metres(first.upper, language)}"
         rows.append({"label": texts["heights"], "value": heights})

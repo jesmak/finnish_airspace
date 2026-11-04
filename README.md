@@ -14,7 +14,7 @@ The areas and aircraft in the picture are made up.
 
 A custom component that reads the NOTAMs Fintraffic ANS publishes for the Helsinki FIR and shows the prohibited,
 restricted and danger areas they switch on, among them the restricted areas set up at short notice, such as one drawn
-around a rescue operation or after an airspace violation near the border. Each area is drawn with its shape from the
+after an airspace violation near the border. Each area is drawn with its shape from the
 Finnish AIP, or with the shape the NOTAM gives itself for a new area, and with its heights, periods and schedule.
 
 The areas come as a **map feed**, one sensor holding every area in force, and those starting within a day, as GeoJSON.

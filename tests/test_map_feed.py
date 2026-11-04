@@ -308,6 +308,17 @@ def test_an_item_of_several_notams() -> None:
     ]
 
 
+def test_the_heights_of_an_item_are_those_of_its_first_notam() -> None:
+    # Listed in the bulletin after the NOTAM that starts later.
+    later = notam("EFR901 ACT. FLARES IN USE", id="A9002/26", start=utc(9, "0600"), end=utc(9, "1500"), upper="FL170")
+    first = notam("EFR901 ACT. FLARES IN USE", id="A9001/26", start=utc(2, "0600"), end=utc(2, "1500"), upper="FL095")
+
+    (item,) = items(later, first)
+    details = feature(item, "en", NOW, HELSINKI)["properties"]["details"]
+
+    assert [row["value"] for row in details if row["label"] == "Heights"] == ["SFC – FL 95 (approx. 2,900 m)"]
+
+
 def test_a_window_closing_at_midnight_in_the_schedule() -> None:
     (item,) = items(notam("EFR901 ACT", start=utc(2, "0600"), end=utc(3, "2200"), schedule="0600-2200"))
 
