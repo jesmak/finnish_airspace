@@ -100,7 +100,9 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
         await self._refresh_enr(now)
         await self._refresh_supplements(bulletin, now)
 
-        result = airspace(bulletin, self.enr, self.supplements, (self.hass.config.latitude, self.hass.config.longitude), now)
+        # The areas' geometry takes tens of milliseconds, too long for the event loop.
+        home = (self.hass.config.latitude, self.hass.config.longitude)
+        result = await self.hass.async_add_executor_job(airspace, bulletin, self.enr, self.supplements, home, now)
         first_poll = self.seen is None
         if self.seen is None:
             self.seen = {}
