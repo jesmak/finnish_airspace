@@ -29,8 +29,8 @@ so an automation decides what is near.
 
 ### With the Marketplace
 
-1. Open Settings › Marketplace, choose Add from link and paste `https://github.com/jesmak/finnish_airspace`
-2. Open Finnish Airspace in the Marketplace and choose Install
+1. Open Settings › Marketplace and search for Finnish Airspace
+2. Open it and choose Install
 3. Restart Home Assistant
 4. Add the integration in Settings › Devices & services
 
@@ -217,6 +217,6 @@ MIT, see [LICENSE](LICENSE).
 [releases-shield]: https://img.shields.io/github/release/jesmak/finnish_airspace.svg?style=for-the-badge
 [release-date-shield]: https://img.shields.io/github/release-date/jesmak/finnish_airspace?style=for-the-badge
 [releases]: https://github.com/jesmak/finnish_airspace/releases
-[marketplace-shield]: https://img.shields.io/badge/Marketplace-Custom-orange.svg?style=for-the-badge
+[marketplace-shield]: https://img.shields.io/badge/Marketplace-Default-green.svg?style=for-the-badge
 [marketplace]: https://my.home-assistant.io/redirect/marketplace_repository/?owner=jesmak&repository=finnish_airspace&category=integration
 [license-shield]: https://img.shields.io/github/license/jesmak/finnish_airspace.svg?style=for-the-badge
