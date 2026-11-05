@@ -3,7 +3,7 @@
 Home Assistant integration that puts the airspace restrictions in force in Finland on a map, from the NOTAMs Fintraffic
 ANS publishes, and fires an event when a new restricted or prohibited area appears.
 
-[![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases] [![Marketplace][marketplace-shield]][marketplace] [![License][license-shield]](LICENSE)
+[![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases] [![Downloads][downloads-shield]][releases] [![Marketplace][marketplace-shield]][marketplace] [![License][license-shield]](LICENSE)
 
 <img src="https://raw.githubusercontent.com/jesmak/finnish_airspace/main/docs/images/dashboard-light.png#gh-light-mode-only" width="1280" alt="A map around Tampere with aircraft in their altitude's colours and four airspace areas under them: a new restricted circle selected, a restricted area starting tomorrow drawn faded, and two danger areas in grey. A legend of the altitudes and area types sits over the map, and the list beside it has the restricted area opened to its heights, period, distance and NOTAM, with a NEW tag on its row">
 <img src="https://raw.githubusercontent.com/jesmak/finnish_airspace/main/docs/images/dashboard-dark.png#gh-dark-mode-only" width="1280" alt="A map around Tampere with aircraft in their altitude's colours and four airspace areas under them: a new restricted circle selected, a restricted area starting tomorrow drawn faded, and two danger areas in grey. A legend of the altitudes and area types sits over the map, and the list beside it has the restricted area opened to its heights, period, distance and NOTAM, with a NEW tag on its row">
@@ -217,6 +217,7 @@ MIT, see [LICENSE](LICENSE).
 [releases-shield]: https://img.shields.io/github/release/jesmak/finnish_airspace.svg?style=for-the-badge
 [release-date-shield]: https://img.shields.io/github/release-date/jesmak/finnish_airspace?style=for-the-badge
 [releases]: https://github.com/jesmak/finnish_airspace/releases
+[downloads-shield]: https://img.shields.io/github/downloads/jesmak/finnish_airspace/total.svg?style=for-the-badge
 [marketplace-shield]: https://img.shields.io/badge/Marketplace-Default-green.svg?style=for-the-badge
 [marketplace]: https://my.home-assistant.io/redirect/marketplace_repository/?owner=jesmak&repository=finnish_airspace&category=integration
 [license-shield]: https://img.shields.io/github/license/jesmak/finnish_airspace.svg?style=for-the-badge
