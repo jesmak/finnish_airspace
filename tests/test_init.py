@@ -26,8 +26,10 @@ ENR_5_1 = (
     "<html><body><table>"
     + row("EFR901 HONKANIEMI", "650000N 0260000E - 650000N 0261000E - 645000N 0261000E", "FL 240", "SFC")
     + row("EFD903 SALOKANGAS", "640000N 0250000E - 640000N 0251000E - 635000N 0251000E", "FL 95", "SFC")
+    + row("EFP904 KALLIO", "643000N 0260000E - 643000N 0261000E - 642000N 0261000E", "500 FT MSL", "SFC", "", types="VIP", activity="H24")
     + "</table></body></html>"
 )
+PERMANENT = "sensor.finnish_airspace_permanent_areas"
 SUPPLEMENT_PDF = pdf(
     [
         "EFD905A KORPIVAARA",
@@ -118,6 +120,43 @@ async def test_the_feed_after_the_first_poll(enable_custom_integrations, hass: H
     assert (state.attributes["without_act"], state.attributes["failed"], state.attributes["missed"]) == ([], [], [])
     # 10:30 is the next update.
     assert entry.runtime_data.update_interval == timedelta(minutes=28)
+
+    # The areas in force without a NOTAM, as a feed of their own.
+    permanent = hass.states.get(PERMANENT)
+    assert permanent.state == "1"
+    (feature,) = permanent.attributes["geojson"]["features"]
+    assert (feature["id"], feature["properties"]["name"], feature["properties"]["dashed"]) == ("standing:EFP904", "Kallio", True)
+    assert permanent.attributes["legend"][-1] == {"color": "#8f9aab", "label": "Permanent area", "dashed": True}
+    assert permanent.attributes["incomplete"] == []
+    assert permanent.attributes["attribution"] == "Fintraffic ANS, ais.fi · Border: National Land Survey of Finland, CC BY 4.0"
+
+
+async def test_areas_stored_in_an_older_form_are_fetched_again(
+    enable_custom_integrations, hass: HomeAssistant, hass_storage: dict, aioclient_mock: AiohttpClientMocker
+) -> None:
+    # As 1.0 stored them: an area along the border with no stretch of it, and no activity.
+    old = {"code": "EFR901", "name": "HONKANIEMI", "ring": [[65.0, 26.0], [65.0, 26.1], [64.8, 26.1], [65.0, 26.0]]}
+    hass_storage[DOMAIN] = {
+        "version": 1,
+        "key": DOMAIN,
+        "data": {
+            "enr": {
+                "etag": '"e0"',
+                "checked": NOW.isoformat(),
+                "areas": {"EFR901": {**old, "along_border": False, "upper": "FL 240", "lower": "SFC"}},
+            },
+            "supplements": [],
+            "seen": {"area:EFR901": (NOW + timedelta(days=7)).isoformat()},
+        },
+    }
+    events = async_capture_events(hass, EVENT_NEW_RESTRICTION)
+    answer(aioclient_mock, RESTRICTED, NEW_AREA)
+    await set_up(hass)
+
+    # ENR 5.1 is read again though it was checked today, and what was seen is still known, so only the new area is news.
+    assert ENR_5_1_URL in fetched(aioclient_mock)
+    assert [event.data["notam"] for event in events] == ["A9004/26"]
+    assert hass.states.get(PERMANENT).state == "1"
 
 
 async def test_a_new_restricted_area_fires_the_event_once(

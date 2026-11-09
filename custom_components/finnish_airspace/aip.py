@@ -10,6 +10,7 @@ from typing import Any
 from pypdf import PdfReader
 from pypdf.errors import PyPdfError
 
+from .border import along
 from .bulletin import AREA_CODE, text_of
 from .geometry import Point, closed, coordinates
 
@@ -23,6 +24,13 @@ ENR_AREA = re.compile(rf"\b({AREA_CODE}) (?:({NAME}) )?Area bounded by lines joi
 # Each area starts with a line "EFD532A KYYVESI", its corner points on the lines after it, then the upper and the lower
 # limit on a line each.
 SUPPLEMENT_AREA = re.compile(rf"^({AREA_CODE}) ({NAME})\n((?:.*\d{{6}}N \d{{7}}E.*\n)+)(.*)\n(.*)", re.M)
+# "… 690307N 0285545E then along Finland_Russia border up to 601201N 0271735E - …"
+ALONG_BORDER = re.compile(r"then along (\w+) border up to")
+# ENR 5.1's activity column, after the types of activity: "MILOPS H24", "UAV NOTAM", "AUP/UUP", or once a schedule of
+# its own, "BLAST MON-FRI 1100-1300 UTC (1000-1200 UTC)". The first of these words after the heights says which.
+ACTIVITY = re.compile(r"\b(?:H24|NOTAM|AUP/UUP|MON|TUE|WED|THU|FRI|SAT|SUN)\b")
+ACTIVITY_END = re.compile(r"\s+AMC manageable area|\s+\d+ [A-Z][a-z]")
+ALWAYS = "H24"
 
 
 @dataclass(frozen=True)
@@ -30,11 +38,16 @@ class Area:
     code: str
     name: str
     ring: list[Point]
-    # Part of its boundary follows the state border, which its corner points alone leave out.
+    # Part of its boundary follows the state border.
     along_border: bool
+    # A stretch it follows isn't in border.json, so its ring is wrong.
+    incomplete: bool
     # Heights as given ("FL 240", "SFC", "4000 FT MSL").
     upper: str | None
     lower: str | None
+    # When ENR 5.1 has it in force without a NOTAM: ALWAYS, or a schedule as published. None for one a NOTAM switches
+    # on, and for every area of a supplement.
+    activity: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -42,8 +55,10 @@ class Area:
             "name": self.name,
             "ring": self.ring,
             "along_border": self.along_border,
+            "incomplete": self.incomplete,
             "upper": self.upper,
             "lower": self.lower,
+            "activity": self.activity,
         }
 
     @classmethod
@@ -53,8 +68,10 @@ class Area:
             name=data["name"],
             ring=[(lat, lon) for lat, lon in data["ring"]],
             along_border=data["along_border"],
+            incomplete=data["incomplete"],
             upper=data["upper"],
             lower=data["lower"],
+            activity=data["activity"],
         )
 
 
@@ -76,13 +93,27 @@ def parse_enr_5_1(page: str) -> dict[str, Area]:
     matches = list(ENR_AREA.finditer(text))
     areas = {}
     for match, following in zip(matches, [*matches[1:], None], strict=True):
-        heights = HEIGHT.findall(text, match.end(), following.start() if following else len(text))
-        area = make_area(match[1], match[2], match[3], heights)
+        rest = text[match.end() : following.start() if following else len(text)]
+        # The upper and the lower limit, then the activity column, which is read from after them.
+        heights = list(HEIGHT.finditer(rest))[:2]
+        area = make_area(match[1], match[2], match[3], [h[0] for h in heights], activity(rest[heights[-1].end() if heights else 0 :]))
         if area:
             areas[area.code] = area
     if not areas:
         raise ValueError("no areas in ENR 5.1")
     return areas
+
+
+def activity(column: str) -> str | None:
+    """ALWAYS, a schedule as published, or None for an area a NOTAM switches on, or a column not understood."""
+    m = ACTIVITY.search(column)
+    if not m or m[0] in ("NOTAM", "AUP/UUP"):
+        return None
+    if m[0] == ALWAYS:
+        return ALWAYS
+    schedule = column[m.start() :]
+    end = ACTIVITY_END.search(schedule)
+    return " ".join((schedule[: end.start()] if end else schedule).split())
 
 
 def parse_supplement(pdf: bytes) -> dict[str, Area]:
@@ -99,16 +130,31 @@ def parse_supplement(pdf: bytes) -> dict[str, Area]:
     return areas
 
 
-def make_area(code: str, name: str | None, points: str, heights: list[str]) -> Area | None:
-    """None for an area with fewer than three corner points, so a NOTAM naming it shows as unmatched."""
-    ring = coordinates(points)
+def make_area(code: str, name: str | None, points: str, heights: list[str], activity_: str | None = None) -> Area | None:
+    """None for an area with fewer than three corner points, so a NOTAM naming it shows as unmatched. A stretch along
+    the state border gets the border's own points between the AIP's.
+    """
+    # The corner points, then by twos the border followed and the corner points after it.
+    parts = ALONG_BORDER.split(points)
+    ring = coordinates(parts[0])
+    incomplete = False
+    for border, after in zip(parts[1::2], parts[2::2], strict=True):
+        corners = coordinates(after)
+        stretch = along(border, ring[-1], corners[0]) if ring and corners else None
+        if stretch is None:
+            incomplete = True
+        else:
+            ring += stretch
+        ring += corners
     if len(ring) < 3:
         return None
     return Area(
         code=code,
         name=(name or "").strip(),
         ring=closed(ring),
-        along_border="along" in points,
+        along_border=len(parts) > 1,
+        incomplete=incomplete,
         upper=heights[0] if heights else None,
         lower=heights[1] if len(heights) > 1 else None,
+        activity=activity_,
     )

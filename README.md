@@ -22,6 +22,10 @@ Show it with [map-feed-card](https://github.com/jesmak/map-feed-card) (1.4.0 or 
 aircraft of an integration such as [ADS-B Live](https://github.com/jesmak/adsb_live). The feed format is documented in
 [map-feed-format.md](https://github.com/jesmak/map-feed-card/blob/main/docs/map-feed-format.md).
 
+The areas in force without a NOTAM, around the clock or on a fixed schedule, such as the prohibited areas over the
+nuclear power plants and in Helsinki, come as a **second map feed**, drawn as dashed outlines behind the others with
+map-feed-card 1.6.0 or newer.
+
 It covers the whole country, so there is nothing to set up. Each area carries its distance from Home Assistant's home,
 so an automation decides what is near.
 
@@ -79,14 +83,40 @@ text, period, `estimated`, schedule, heights and the windows of a schedule that 
 
 Beside the feed, four attributes show what didn't fit, so a mismatch shows instead of vanishing:
 
-| Attribute     | What it lists                                                                                                                                                                                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `not_found`   | NOTAMs naming an area found neither in the AIP supplement they refer to nor in ENR 5.1, with its codes. An area whose boundary follows the state border (EFR100, EFD400) is listed here, not drawn, if a NOTAM names it. |
-| `without_act` | NOTAMs that name an area without saying `ACT`, such as an aerodrome's notice about what happens while an area is active, in case one is an activation worded some other way.                                             |
-| `failed`      | The texts of NOTAMs that didn't parse.                                                                                                                                                                                   |
-| `missed`      | The ids of NOTAMs the bulletin's markup hid from the parser.                                                                                                                                                             |
+| Attribute     | What it lists                                                                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `not_found`   | NOTAMs naming an area found neither in the AIP supplement they refer to nor in ENR 5.1, with its codes, or one along a stretch of the state border the integration has no line for (see [the border](#the-border)). |
+| `without_act` | NOTAMs that name an area without saying `ACT`, such as an aerodrome's notice about what happens while an area is active, in case one is an activation worded some other way.                                        |
+| `failed`      | The texts of NOTAMs that didn't parse.                                                                                                                                                                              |
+| `missed`      | The ids of NOTAMs the bulletin's markup hid from the parser.                                                                                                                                                        |
 
 The sensor is unavailable while the bulletin can't be read or has no NOTAMs in it, rather than showing an empty sky.
+
+### The permanent areas
+
+`sensor.finnish_airspace_permanent_areas`, named in Home Assistant's language when the sensor is first created (in Finnish
+`sensor.finnish_airspace_pysyvat_alueet`), has the number of areas ENR 5.1 has in force without a NOTAM as its state. They are
+those in force around the clock (`H24`), such as the prohibited areas over Loviisa, Olkiluoto, Kilpilahti and parts of
+Helsinki, and the few with a fixed schedule of their own. It is a map feed like the other, with the same legend and an
+entry explaining the dashes. A card shows it best with `in_list: false`, so its areas, which never change, stay out of
+the list.
+
+- **Drawn** as a dashed outline without fill in the area type's colour, with map-feed-card 1.6.0 or newer, so they stay
+  behind the areas switched on today. A tap anywhere inside one shows its details.
+- **Name:** the area's name from the AIP, or its type and code for one without (`Restricted area EFR100`).
+- **Details:** the heights, `Always` or the schedule as published (`MON-FRI 1100-1300 UTC (1000-1200 UTC)`), the
+  distance, and a link to ENR 5.1.
+
+Each feature carries `area_type`, `codes`, `activity` (`H24` or the schedule) and `distance_km`. Beside the feed,
+`incomplete` lists the areas left out because they follow a stretch of the state border the integration has no line
+for.
+
+### The border
+
+Two areas, EFR100 and EFD400, follow the state border, which ENR 5.1 gives as words ("then along Finland_Russia border
+up to …") rather than points. The integration draws that stretch with the National Land Survey of Finland's border line,
+bundled with it. An area following a border the line doesn't have, or one whose end points have moved more than a
+kilometre off it, isn't drawn, as its corner points alone would make a wedge over much of eastern Finland.
 
 ## Events
 
@@ -126,6 +156,9 @@ entities:
       labels: true
     - entity: sensor.finnish_airspace
       frame: false
+    - entity: sensor.finnish_airspace_permanent_areas
+      frame: false
+      in_list: false
 ```
 
 A notice when a new restriction appears within 50 km of home:
@@ -156,6 +189,10 @@ permanent areas and the AIP supplements for the temporary ones. Fintraffic ANS o
 GEN 0.1, the aeronautical information products are available for further refining and research without a separate fee
 or agreement, and only reselling them as such needs one.
 
+The state border is the National Land Survey of Finland's realm outline, SuomenValtakunta_2025_100k 11/2026, licensed
+under [CC BY 4.0](https://www.maanmittauslaitos.fi/en/opendata-licence-cc40). The integration carries the stretches it
+needs, simplified to 100 metres, in `border.json`, under the same licence ([LICENSE-border](LICENSE-border)).
+
 The bulletin is updated every half hour and says when next. The integration reads it a few minutes after that, asking
 only for a page that has changed, reads ENR 5.1 once a day and each supplement once. The areas read from the AIP are
 kept, so a day the AIP can't be reached doesn't empty the map.
@@ -164,7 +201,6 @@ Left out:
 
 - Trigger NOTAMs, which announce an area a later NOTAM switches on, and NOTAMs that change an area's limits for good.
 - Notices without an area, such as GNSS interference across the FIR.
-- The areas in force around the clock, which no NOTAM switches on.
 
 This integration is not affiliated with or endorsed by Fintraffic ANS. It is not for planning or flying a flight.
 Check the NOTAMs on ais.fi for that.
@@ -187,20 +223,24 @@ python3.14 -m venv .venv
 .venv/bin/ruff format --check .
 ```
 
-| Path                           | What it contains                                                                            |
-| ------------------------------ | ------------------------------------------------------------------------------------------- |
-| `__init__.py`                  | Setup, and removing the stored memory with the integration                                  |
-| `const.py`                     | The addresses, polling times and the event's name                                           |
-| `config_flow.py`               | The form, which asks nothing                                                                |
-| `coordinator.py`               | Fetching the bulletin, ENR 5.1 and the supplements, storage, polling times and the event    |
-| `sensor.py`                    | The map feed sensor                                                                         |
-| `bulletin.py`                  | Reading the NOTAM bulletin and what each NOTAM says about areas                             |
-| `schedule.py`                  | A NOTAM's schedule as windows within its period                                             |
-| `aip.py`                       | Reading ENR 5.1 and the supplements' areas, and heights in one form                         |
-| `geometry.py`                  | Coordinates, circles and distances                                                          |
-| `feed.py`                      | Matching NOTAMs with areas into items, their activity and heights, and which areas are news |
-| `map_feed.py`                  | The items as a map feed, with names, list rows, details, colours, the legend and the texts  |
-| `translations/<language>.json` | Home Assistant UI texts                                                                     |
+| Path                           | What it contains                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------ |
+| `__init__.py`                  | Setup, and removing the stored memory with the integration                                 |
+| `const.py`                     | The addresses, polling times and the event's name                                          |
+| `config_flow.py`               | The form, which asks nothing                                                               |
+| `coordinator.py`               | Fetching the bulletin, ENR 5.1 and the supplements, storage, polling times and the event   |
+| `sensor.py`                    | The two map feed sensors                                                                   |
+| `bulletin.py`                  | Reading the NOTAM bulletin and what each NOTAM says about areas                            |
+| `schedule.py`                  | A NOTAM's schedule as windows within its period                                            |
+| `aip.py`                       | Reading ENR 5.1 and the supplements' areas, their activity, and heights in one form        |
+| `border.py`, `border.json`     | The state border's stretches the areas follow, fitted between the AIP's points             |
+| `geometry.py`                  | Coordinates, circles and distances                                                         |
+| `feed.py`                      | Items from NOTAMs and areas, their activity, heights and news, and the permanent areas     |
+| `map_feed.py`                  | The items as a map feed, with names, list rows, details, colours, the legend and the texts |
+| `translations/<language>.json` | Home Assistant UI texts                                                                    |
+
+`scripts/border.py` writes `border.json` from the National Land Survey's data, and is run again only for a new edition
+or a stretch of the border ENR 5.1 starts to follow. It needs `pyshp` and `pyproj`, which the integration itself doesn't.
 
 The pictures come from [hass-screenshots](https://github.com/jesmak/hass-screenshots) and `docs/screenshots.json`.
 

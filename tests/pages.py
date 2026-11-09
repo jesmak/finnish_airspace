@@ -53,8 +53,18 @@ def page(*parts: str, next_update: str = "1130") -> str:
     )
 
 
-def row(title: str, points: str, upper: str, lower: str, remarks: str = "AMC manageable area") -> str:
-    """An area's row in ENR 5.1, its heights in a table of their own inside the row."""
+def row(
+    title: str,
+    points: str,
+    upper: str,
+    lower: str,
+    remarks: str = "AMC manageable area",
+    types: str = "MILOPS",
+    activity: str = "NOTAM",
+) -> str:
+    """An area's row in ENR 5.1, its heights in a table of their own inside the row, then the types of activity, the
+    activity (H24, NOTAM or a schedule) and the remarks.
+    """
     span = '<span space="preserve" style="font-family: Arial ,PMingLiU;"><span space="preserve" style="font-size:12px;">'
     return (
         f'<tr><td style="text-align: left" valign="top"><a id="1tab2"></a>{span}<span class="bold"><strong>{title}</strong></span>'
@@ -64,7 +74,7 @@ def row(title: str, points: str, upper: str, lower: str, remarks: str = "AMC man
         f"<tr><td></td><td>{span}{upper}</span></span><br>{span}<hr></hr></span></span><br></td><td></td></tr>"
         f"<tr><td></td><td>{span}{lower}</span></span><br></td><td></td></tr>"
         "<tr><td></td><td></td><td></td></tr></tbody></table></div></td>"
-        f"<td>{span}MILOPS</span></span></td><td>{span}NOTAM</span></span></td><td>{span}{remarks}</span></span></td></tr>"
+        f"<td>{span}{types}</span></span></td><td>{span}{activity}</span></span></td><td>{span}{remarks}</span></span></td></tr>"
     )
 
 

@@ -6,5 +6,12 @@
         "description": "Suomen ilmatilan voimassa olevat rajoitukset Fintraffic ANS:n julkaisemista NOTAM-tiedotteista."
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "permanent_areas": {
+        "name": "Pysyvät alueet"
+      }
+    }
   }
 }

@@ -8,12 +8,17 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
+from custom_components.finnish_airspace.aip import Area
+from custom_components.finnish_airspace.bulletin import AreaType
+from custom_components.finnish_airspace.feed import Standing
 from custom_components.finnish_airspace.map_feed import (
     LATER_OPACITY,
     feature,
     feed_attributes,
     language_of,
     short_codes,
+    standing_attributes,
+    standing_feature,
     title_case,
     when,
     with_metres,
@@ -35,6 +40,8 @@ def utc(day: int, hhmm: str) -> datetime:
         ("KYYVESI", "Kyyvesi"),
         ("HIIENVAARA (KOITERE)", "Hiienvaara (Koitere)"),
         ("KELLUU ITÄ-SUOMI", "Kelluu Itä-Suomi"),
+        ("HÄSTÖ-BUSÖ", "Hästö-Busö"),
+        ("ITÄINEN VAARA-ALUE", "Itäinen vaara-alue"),
         ("ÄIJÄNSALO", "Äijänsalo"),
     ],
 )
@@ -357,3 +364,53 @@ def test_no_property_is_null() -> None:
         return []
 
     assert nulls(feature(item, "fi", NOW, HELSINKI)) == []
+
+
+def test_an_area_in_force_without_a_notam() -> None:
+    ring = [(65.0, 25.0), (65.0, 25.1), (64.9, 25.1), (65.0, 25.0)]
+    always = Standing(Area("EFR100", "", ring, True, False, "FL 280", "SFC", "H24"), AreaType.RESTRICTED, 31.2, "Raja_2025 06/2026")
+    scheduled = Standing(
+        Area("EFD158", "LAPPEENRANTA", ring, False, False, "2700 FT MSL", "SFC", "MON-FRI 1100-1300 UTC (1000-1200 UTC)"),
+        AreaType.DANGER,
+        7.04,
+        None,
+    )
+
+    fi = standing_feature(always, "fi")
+    assert fi["id"] == "standing:EFR100"
+    assert fi["geometry"] == {"type": "Polygon", "coordinates": [[[25.0, 65.0], [25.1, 65.0], [25.1, 64.9], [25.0, 65.0]]]}
+    properties = fi["properties"]
+    assert (properties["name"], properties["subtitle"], properties["color"], properties["dashed"]) == (
+        "Rajoitusalue EFR100",
+        "Rajoitusalue",
+        "#d4603f",
+        True,
+    )
+    assert properties["list"] == {"title": "Rajoitusalue EFR100", "text": "EFR100 · aina voimassa", "value": "31 km"}
+    assert properties["details"] == [
+        {"label": "Korkeus", "value": "SFC – FL 280 (n. 8 500 m)"},
+        {"label": "Voimassa", "value": "Aina"},
+        {"label": "Etäisyys", "value": "31,2 km"},
+    ]
+    # The border it follows is the National Land Survey's, credited as CC BY asks.
+    assert properties["footer"] == "AIP ENR 5.1 · Raja: Maanmittauslaitos, Raja_2025 06/2026, CC BY 4.0"
+    assert properties["link"]["label"] == "AIP ENR 5.1 ais.fi:ssä"
+
+    en = standing_feature(scheduled, "en")["properties"]
+    assert (en["name"], en["list"]["text"], en["list"]["value"]) == (
+        "Lappeenranta",
+        "EFD158 · MON-FRI 1100-1300 UTC (1000-1200 UTC)",
+        "7.0 km",
+    )
+    assert en["details"][:2] == [
+        {"label": "Heights", "value": "SFC – 2700 ft MSL (820 m)"},
+        {"label": "In force", "value": "MON-FRI 1100-1300 UTC (1000-1200 UTC)"},
+    ]
+    assert en["footer"] == "AIP ENR 5.1"
+
+
+def test_the_permanent_feed_s_legend_explains_its_dashes() -> None:
+    legend = standing_attributes("fi")["legend"]
+
+    assert legend[:3] == feed_attributes("fi")["legend"]
+    assert legend[3] == {"color": "#8f9aab", "label": "Pysyvä alue", "dashed": True}

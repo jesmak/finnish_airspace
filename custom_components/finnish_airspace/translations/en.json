@@ -6,5 +6,12 @@
         "description": "The airspace restrictions in force in Finland, from the NOTAMs published by Fintraffic ANS."
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "permanent_areas": {
+        "name": "Permanent areas"
+      }
+    }
   }
 }

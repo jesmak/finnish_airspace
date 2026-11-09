@@ -12,9 +12,9 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
-from .const import ATTRIBUTION, DOMAIN, MAP_FEED_VERSION, TITLE
+from .const import ATTRIBUTION, BORDER_ATTRIBUTION, DOMAIN, MAP_FEED_VERSION, TITLE
 from .coordinator import AirspaceConfigEntry, AirspaceCoordinator
-from .map_feed import feature, feed_attributes, language_of
+from .map_feed import feature, feed_attributes, language_of, standing_attributes, standing_feature
 
 
 async def async_setup_entry(
@@ -22,22 +22,19 @@ async def async_setup_entry(
     entry: AirspaceConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    async_add_entities([MapFeedSensor(entry.runtime_data)])
+    async_add_entities([MapFeedSensor(entry.runtime_data), PermanentFeedSensor(entry.runtime_data)])
 
 
-class MapFeedSensor(CoordinatorEntity[AirspaceCoordinator], SensorEntity):
+class AirspaceSensor(CoordinatorEntity[AirspaceCoordinator], SensorEntity):
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True
-    # The device's name: the integration has this one entity.
-    _attr_name = None
-    _attr_icon = "mdi:airplane-alert"
-    # The feed and the lists of NOTAMs can be long: only the count goes to the database.
+    # The feeds can be long: only the count goes to the database.
     _unrecorded_attributes = frozenset({MATCH_ALL})
 
-    def __init__(self, coordinator: AirspaceCoordinator) -> None:
+    def __init__(self, coordinator: AirspaceCoordinator, key: str) -> None:
         super().__init__(coordinator)
         entry = coordinator.config_entry
-        self._attr_unique_id = f"{entry.entry_id}_map"
+        self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=TITLE,
@@ -45,6 +42,43 @@ class MapFeedSensor(CoordinatorEntity[AirspaceCoordinator], SensorEntity):
             entry_type=DeviceEntryType.SERVICE,
             configuration_url="https://www.ais.fi",
         )
+
+
+class PermanentFeedSensor(AirspaceSensor):
+    """The areas in force without a NOTAM, as a feed of their own, so a card can keep them out of its list."""
+
+    _attr_translation_key = "permanent_areas"
+    _attr_icon = "mdi:shield-airplane-outline"
+    _attr_attribution = f"{ATTRIBUTION} · {BORDER_ATTRIBUTION}"
+
+    def __init__(self, coordinator: AirspaceCoordinator) -> None:
+        super().__init__(coordinator, "permanent")
+
+    @property
+    def native_value(self) -> int:
+        return len(self.coordinator.data.standing)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        data = self.coordinator.data
+        language = language_of(self.hass.config.language)
+        return {
+            "map_feed_version": MAP_FEED_VERSION,
+            "feed_type": "air",
+            **standing_attributes(language),
+            "geojson": {"type": "FeatureCollection", "features": [standing_feature(standing, language) for standing in data.standing]},
+            # So an area the border line couldn't draw shows instead of vanishing.
+            "incomplete": data.standing_incomplete,
+        }
+
+
+class MapFeedSensor(AirspaceSensor):
+    # Named by the device, as the integration's main feed.
+    _attr_name = None
+    _attr_icon = "mdi:airplane-alert"
+
+    def __init__(self, coordinator: AirspaceCoordinator) -> None:
+        super().__init__(coordinator, "map")
 
     @property
     def native_value(self) -> int:

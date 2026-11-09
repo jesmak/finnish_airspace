@@ -35,6 +35,9 @@ from .feed import Airspace, airspace, event_data, news
 _LOGGER = logging.getLogger(__name__)
 
 STORAGE_VERSION = 1
+# The form the stored areas are in. Areas stored in another are dropped and fetched again, the memory of what was
+# seen kept, so an update doesn't fire the events again.
+AREAS_FORMAT = 2
 TIMEOUT = aiohttp.ClientTimeout(total=60)
 
 
@@ -72,6 +75,9 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
         stored = await self._store.async_load()
         if not stored:
             return
+        self.seen = stored["seen"]
+        if stored.get("areas_format") != AREAS_FORMAT:
+            return
         enr = stored["enr"]
         self.enr = {code: Area.from_dict(area) for code, area in enr["areas"].items()}
         self._enr_etag = enr["etag"]
@@ -80,7 +86,6 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
             supplement = Supplement(data["number"], data["year"], data["airac"])
             self.supplements[supplement] = {code: Area.from_dict(area) for code, area in data["areas"].items()}
             self._supplements_named[supplement] = datetime.fromisoformat(data["named"])
-        self.seen = stored["seen"]
 
     async def async_save(self) -> None:
         """Writes the memory now, so a reload right after a poll can't lose it and fire its events again."""
@@ -206,6 +211,7 @@ class AirspaceCoordinator(DataUpdateCoordinator[Airspace]):
 
     def _stored(self) -> dict[str, Any]:
         return {
+            "areas_format": AREAS_FORMAT,
             "enr": {
                 "etag": self._enr_etag,
                 "checked": self._enr_checked.isoformat() if self._enr_checked else None,

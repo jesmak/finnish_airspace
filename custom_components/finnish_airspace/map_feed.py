@@ -6,9 +6,10 @@ import re
 from datetime import date, datetime, timedelta, tzinfo
 from typing import Any
 
+from .aip import ALWAYS, height
 from .bulletin import AreaType, Supplement
-from .const import SUPPLEMENT_URL
-from .feed import Activation, Item, to_midnight
+from .const import ENR_5_1_URL, SUPPLEMENT_URL
+from .feed import Activation, Item, Standing, to_midnight
 
 # The danger areas, most of the items, a quiet grey, so they stay in the background and keep clear of the colours an
 # aircraft feed gives altitudes.
@@ -45,6 +46,12 @@ TEXTS: dict[str, dict[str, str]] = {
         "by_distance": "Distance",
         "areas": "areas",
         "area": "area",
+        "permanent": "Permanent area",
+        "in_force": "In force",
+        "always": "Always",
+        "always_in_force": "always in force",
+        "enr_link": "AIP ENR 5.1 on ais.fi",
+        "border_credit": "Border: National Land Survey of Finland, {dataset}, CC BY 4.0",
     },
     "fi": {
         "prohibited": "Kieltoalue",
@@ -69,6 +76,12 @@ TEXTS: dict[str, dict[str, str]] = {
         "by_distance": "Etäisyys",
         "areas": "aluetta",
         "area": "alue",
+        "permanent": "Pysyvä alue",
+        "in_force": "Voimassa",
+        "always": "Aina",
+        "always_in_force": "aina voimassa",
+        "enr_link": "AIP ENR 5.1 ais.fi:ssä",
+        "border_credit": "Raja: Maanmittauslaitos, {dataset}, CC BY 4.0",
     },
 }
 WEEKDAYS = {"en": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], "fi": ["ma", "ti", "ke", "to", "pe", "la", "su"]}
@@ -94,6 +107,52 @@ def feed_attributes(language: str) -> dict[str, Any]:
             "count": texts["areas"],
             "count_one": texts["area"],
         },
+    }
+
+
+def standing_attributes(language: str) -> dict[str, Any]:
+    """The NOTAM feed's legend and list, and a dashed entry for these areas' outlines."""
+    attributes = feed_attributes(language)
+    attributes["legend"].append({"color": COLORS[AreaType.DANGER], "label": texts_for(language)["permanent"], "dashed": True})
+    return attributes
+
+
+def standing_feature(standing: Standing, language: str) -> dict[str, Any]:
+    """An area in force without a NOTAM, drawn dashed and without fill so it stays behind the areas switched on."""
+    texts = texts_for(language)
+    area = standing.area
+    kind = texts[standing.area_type.value]
+    name = title_case(area.name) if area.name else f"{kind} {area.code}"
+    always = area.activity == ALWAYS
+    distance = texts["km"].format(km=number(standing.distance_km, language, decimals=0 if standing.distance_km >= 10 else 1))
+    rows = []
+    if area.lower or area.upper:
+        lower, upper = (with_metres(height(value) if value else None, language) for value in (area.lower, area.upper))
+        rows.append({"label": texts["heights"], "value": f"{lower} – {upper}"})
+    rows.append({"label": texts["in_force"], "value": texts["always"] if always else area.activity})
+    rows.append({"label": texts["distance"], "value": texts["km"].format(km=number(standing.distance_km, language, decimals=1))})
+    # The areas along the state border are drawn with the National Land Survey's line, which CC BY asks to credit.
+    footer = ["AIP ENR 5.1", *([texts["border_credit"].format(dataset=standing.border_dataset)] if standing.border_dataset else [])]
+    properties = {
+        "name": name,
+        "kind": "air.area",
+        "subtitle": kind,
+        "color": COLORS[standing.area_type],
+        "dashed": True,
+        "list": {"title": name, "text": f"{area.code} · {texts['always_in_force'] if always else area.activity}", "value": distance},
+        "details": rows,
+        "footer": " · ".join(footer),
+        "link": {"url": ENR_5_1_URL, "label": texts["enr_link"]},
+        "area_type": standing.area_type.value,
+        "codes": [area.code],
+        "activity": area.activity,
+        "distance_km": standing.distance_km,
+    }
+    return {
+        "type": "Feature",
+        "id": f"standing:{area.code}",
+        "geometry": {"type": "Polygon", "coordinates": [[[round(lon, 5), round(lat, 5)] for lat, lon in area.ring]]},
+        "properties": properties,
     }
 
 
@@ -269,8 +328,11 @@ def number(value: float, language: str, decimals: int = 0) -> str:
 
 
 def title_case(name: str) -> str:
-    """The AIP's names are in capitals: "HIIENVAARA (KOITERE)" is "Hiienvaara (Koitere)"."""
-    return re.sub(r"(^|[\s(/-])(\w)", lambda m: m[1] + m[2].upper(), name.lower())
+    """The AIP's names are in capitals: "HIIENVAARA (KOITERE)" is "Hiienvaara (Koitere)". A part after a hyphen is a
+    place too ("Hästö-Busö"), except "alue", area, as in "Itäinen vaara-alue".
+    """
+    titled = re.sub(r"(^|[\s(/-])(\w)", lambda m: m[1] + m[2].upper(), name.lower())
+    return re.sub(r"(\w+)-Alue\b", lambda m: f"{m[1].lower()}-alue", titled)
 
 
 def short_codes(codes: list[str]) -> str:

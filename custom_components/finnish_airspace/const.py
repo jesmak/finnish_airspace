@@ -7,8 +7,10 @@ DOMAIN: Final = "finnish_airspace"
 TITLE: Final = "Finnish Airspace"
 
 ATTRIBUTION: Final = "Fintraffic ANS, ais.fi"
+# The state border in border.json, which CC BY 4.0 asks to credit.
+BORDER_ATTRIBUTION: Final = "Border: National Land Survey of Finland, CC BY 4.0"
 
-USER_AGENT: Final = "FinnishAirspace/1.0.3 (https://github.com/jesmak/finnish_airspace; Home Assistant integration)"
+USER_AGENT: Final = "FinnishAirspace/1.1.0 (https://github.com/jesmak/finnish_airspace; Home Assistant integration)"
 
 # The content of the IFR bulletin for the whole Helsinki FIR, in ISO-8859-1 by its own markup.
 BULLETIN_URL: Final = "https://www.ais.fi/bulletins/efinen.htm"

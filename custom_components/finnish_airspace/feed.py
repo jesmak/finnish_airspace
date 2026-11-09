@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from .aip import Area, height
-from .bulletin import AreaType, Bulletin, Kind, Notam, Supplement
+from .border import border_dataset
+from .bulletin import AREA_TYPES, AreaType, Bulletin, Kind, Notam, Supplement
 from .geometry import Point, distance_km
 from .schedule import Window, merged, schedule_windows
 
@@ -65,11 +66,27 @@ class Item:
 
 
 @dataclass(frozen=True)
+class Standing:
+    """An area of ENR 5.1 in force without a NOTAM: always, or on a schedule of its own."""
+
+    area: Area
+    area_type: AreaType
+    distance_km: float
+    # The dataset the border it follows comes from, for the credit, None for an area away from the border. Read here,
+    # in the executor, so writing the feed never opens border.json on the event loop.
+    border_dataset: str | None
+
+
+@dataclass(frozen=True)
 class Airspace:
-    """Everything the bulletin says about areas, at one moment."""
+    """Everything the bulletin says about areas, at one moment, and the areas in force without it."""
 
     # Every item with a NOTAM not yet ended, in the bulletin's order.
     items: list[Item]
+    # In ENR 5.1's order.
+    standing: list[Standing]
+    # The codes of standing areas not drawn, as they follow a stretch of the border the bundled line doesn't give.
+    standing_incomplete: list[str]
     # NOTAMs naming an area without saying ACT, which the parser can't tell from an activation worded some other way.
     without_act: list[Notam]
     # The texts of the NOTAMs that didn't parse, and the ids of those the parser missed.
@@ -98,8 +115,20 @@ def airspace(
                 groups.setdefault(item_key(notam), []).append(notam)
         elif notam.kind == Kind.OTHER and notam.codes:
             without_act.append(notam)
+    in_force = [area for area in enr.values() if area.activity]
     return Airspace(
         items=[make_item(key, notams, enr, supplements, home, now) for key, notams in groups.items()],
+        standing=[
+            Standing(
+                area,
+                AREA_TYPES[area.code[2]],
+                round(distance_km(home, [area.ring]), 1),
+                border_dataset() if area.along_border else None,
+            )
+            for area in in_force
+            if not area.incomplete
+        ],
+        standing_incomplete=[area.code for area in in_force if area.incomplete],
         without_act=without_act,
         failed=bulletin.failed,
         missed=bulletin.missed,
@@ -112,12 +141,11 @@ def item_key(notam: Notam) -> str:
 
 
 def find_area(code: str, supplement: Supplement | None, enr: dict[str, Area], supplements: Supplements) -> Area | None:
-    """From the supplement the NOTAM names, otherwise from ENR 5.1.
-
-    None for an area following the state border, whose corner points alone make a wedge over much of the east.
+    """From the supplement the NOTAM names, otherwise from ENR 5.1. None for an area following a stretch of the state
+    border the bundled line doesn't give, whose corner points alone would make a wedge over much of the east.
     """
     area = (supplements.get(supplement, {}).get(code) if supplement else None) or enr.get(code)
-    return None if area is None or area.along_border else area
+    return None if area is None or area.incomplete else area
 
 
 def make_item(

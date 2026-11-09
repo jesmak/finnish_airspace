@@ -7,6 +7,7 @@ from datetime import UTC, datetime, time, timedelta
 import pytest
 
 from custom_components.finnish_airspace.aip import Area, height
+from custom_components.finnish_airspace.border import border_dataset
 from custom_components.finnish_airspace.bulletin import AreaType, Bulletin, Notam, Supplement
 from custom_components.finnish_airspace.coordinator import next_poll
 from custom_components.finnish_airspace.feed import Item, airspace, event_data, news
@@ -23,18 +24,18 @@ def square(lat: float, lon: float) -> list[tuple[float, float]]:
 
 
 ENR = {
-    "EFR901": Area("EFR901", "HONKANIEMI", square(65.5, 26.0), False, "FL 240", "SFC"),
-    "EFR902": Area("EFR902", "LEHTOVAARA", square(65.3, 26.0), False, "FL 240", "SFC"),
-    "EFR903": Area("EFR903", "SALOKANGAS", square(65.1, 26.5), False, "FL 95", "SFC"),
-    "EFD905A": Area("EFD905A", "ÄIJÄNSALO", square(64.0, 25.0), False, "3000 FT MSL", "SFC"),
-    "EFR100": Area("EFR100", "", square(66.0, 29.0), True, "FL 280", "SFC"),
+    "EFR901": Area("EFR901", "HONKANIEMI", square(65.5, 26.0), False, False, "FL 240", "SFC"),
+    "EFR902": Area("EFR902", "LEHTOVAARA", square(65.3, 26.0), False, False, "FL 240", "SFC"),
+    "EFR903": Area("EFR903", "SALOKANGAS", square(65.1, 26.5), False, False, "FL 95", "SFC"),
+    "EFD905A": Area("EFD905A", "ÄIJÄNSALO", square(64.0, 25.0), False, False, "3000 FT MSL", "SFC"),
+    "EFR100": Area("EFR100", "", square(66.0, 29.0), True, True, "FL 280", "SFC"),
 }
 SUPPLEMENTS = {
     SUP: {
-        "EFD905A": Area("EFD905A", "KORPIVAARA", square(63.0, 27.0), False, "FL 70", "1600 FT MSL"),
-        "EFD905B": Area("EFD905B", "KORPIVAARA", square(63.2, 27.0), False, "FL 70", "1600 FT MSL"),
+        "EFD905A": Area("EFD905A", "KORPIVAARA", square(63.0, 27.0), False, False, "FL 70", "1600 FT MSL"),
+        "EFD905B": Area("EFD905B", "KORPIVAARA", square(63.2, 27.0), False, False, "FL 70", "1600 FT MSL"),
     },
-    Supplement(79, 2026, False): {"EFD907A": Area("EFD907A", "PITKÄSALO", square(62.5, 28.0), False, "FL 50", "SFC")},
+    Supplement(79, 2026, False): {"EFD907A": Area("EFD907A", "PITKÄSALO", square(62.5, 28.0), False, False, "FL 50", "SFC")},
 }
 
 
@@ -459,3 +460,26 @@ def at(hhmm: str, day: int = 2) -> datetime:
 )
 def test_next_poll(fetched: datetime, next_update: time | None, expected: datetime) -> None:
     assert next_poll(fetched, next_update) == expected
+
+
+def test_the_areas_in_force_without_a_notam() -> None:
+    weekdays = "MON-FRI 1100-1300 UTC (1000-1200 UTC)"
+    enr = {
+        **ENR,
+        # Around home, then 0.5° to the south.
+        "EFP906": Area("EFP906", "KALLIO", square(65.05, 25.4), False, False, "500 FT MSL", "SFC", "H24"),
+        "EFR907": Area("EFR907", "SORAKUOPPA", square(64.5, 25.4), False, False, "2700 FT MSL", "SFC", weekdays),
+        # Along a stretch of the border the bundled line doesn't give, and one along a stretch it does.
+        "EFR908": Area("EFR908", "", square(66.0, 29.0), True, True, "FL 280", "SFC", "H24"),
+        "EFR909": Area("EFR909", "", square(61.0, 29.0), True, False, "FL 280", "SFC", "H24"),
+    }
+    result = airspace(Bulletin(time(10, 30), [], [], []), enr, SUPPLEMENTS, HOME, NOW)
+
+    assert [(standing.area.code, standing.area_type, standing.border_dataset) for standing in result.standing] == [
+        ("EFP906", AreaType.PROHIBITED, None),
+        ("EFR907", AreaType.RESTRICTED, None),
+        # The border's credit is read here, in the executor, not when the feed is written.
+        ("EFR909", AreaType.RESTRICTED, border_dataset()),
+    ]
+    assert [standing.distance_km for standing in result.standing[:2]] == [0.0, 55.7]
+    assert result.standing_incomplete == ["EFR908"]
