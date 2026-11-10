@@ -155,9 +155,9 @@ entities:
       show_area: true
       labels: true
     - entity: sensor.finnish_airspace
-      frame: false
+      frame: off
     - entity: sensor.finnish_airspace_permanent_areas
-      frame: false
+      frame: off
       in_list: false
 ```
 
