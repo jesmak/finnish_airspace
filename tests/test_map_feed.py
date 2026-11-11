@@ -234,7 +234,7 @@ def test_a_feature_in_english_without_a_place_name() -> None:
         {"label": "Schedule", "value": "SR-SS"},
         {"label": "Distance", "value": "0.0 km"},
     ]
-    assert properties["link"] == {"url": "https://www.ais.fi/en/pre-flight-information-bulletins", "label": "NOTAM bulletin on ais.fi"}
+    assert properties["link"] == {"url": "https://www.ais.fi/bulletins/efinen.htm", "label": "NOTAM bulletin on ais.fi"}
 
 
 def test_an_estimated_end_and_an_airac_supplement() -> None:

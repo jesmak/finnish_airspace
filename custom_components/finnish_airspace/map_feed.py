@@ -8,7 +8,7 @@ from typing import Any
 
 from .aip import ALWAYS, height
 from .bulletin import AreaType, Supplement
-from .const import ENR_5_1_URL, SUPPLEMENT_URL
+from .const import BULLETIN_URL, ENR_5_1_URL, SUPPLEMENT_URL
 from .feed import Activation, Item, Standing, to_midnight
 
 # The danger areas, most of the items, a quiet grey, so they stay in the background and keep clear of the colours an
@@ -16,7 +16,6 @@ from .feed import Activation, Item, Standing, to_midnight
 COLORS = {AreaType.PROHIBITED: "#e03131", AreaType.RESTRICTED: "#d4603f", AreaType.DANGER: "#8f9aab"}
 # An area not in force now stands back.
 LATER_OPACITY = 0.45
-BULLETIN_PAGE = "https://www.ais.fi/en/pre-flight-information-bulletins"
 # The next windows of a schedule shown in the details.
 WINDOWS_SHOWN = 3
 FLIGHT_LEVEL = re.compile(r"FL (\d+)")
@@ -367,7 +366,7 @@ def link(item: Item, language: str) -> dict[str, str]:
         supplement = named[0]
         url = SUPPLEMENT_URL.format(year=supplement.year, airac="A_" if supplement.airac else "", number=supplement.number)
         return {"url": url, "label": texts["supplement_link"].format(supplement=supplement_name(supplement))}
-    return {"url": BULLETIN_PAGE, "label": texts["bulletin_link"]}
+    return {"url": BULLETIN_URL, "label": texts["bulletin_link"]}
 
 
 def iso(value: datetime | None) -> str | None:
