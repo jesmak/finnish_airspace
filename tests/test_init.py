@@ -10,8 +10,8 @@ import pytest
 from freezegun.api import FrozenDateTimeFactory
 from homeassistant.const import EVENT_HOMEASSISTANT_FINAL_WRITE, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry, async_capture_events
-from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
+from pytest_homeassistant.common import MockConfigEntry, async_capture_events
+from pytest_homeassistant.test_util.aiohttp import AiohttpClientMocker
 
 from custom_components.finnish_airspace.const import BULLETIN_URL, DOMAIN, ENR_5_1_URL, EVENT_NEW_RESTRICTION, LATE, SUPPLEMENT_URL
 from custom_components.finnish_airspace.coordinator import AirspaceCoordinator
@@ -95,7 +95,7 @@ async def refresh(hass: HomeAssistant, entry: MockConfigEntry, freezer: FrozenDa
     await hass.async_block_till_done()
 
 
-async def test_the_feed_after_the_first_poll(enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+async def test_the_feed_after_the_first_poll(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
     events = async_capture_events(hass, EVENT_NEW_RESTRICTION)
     answer(aioclient_mock, RESTRICTED, DANGER, UNKNOWN, NEW_AREA)
     entry = await set_up(hass)
@@ -132,7 +132,7 @@ async def test_the_feed_after_the_first_poll(enable_custom_integrations, hass: H
 
 
 async def test_areas_stored_in_an_older_form_are_fetched_again(
-    enable_custom_integrations, hass: HomeAssistant, hass_storage: dict, aioclient_mock: AiohttpClientMocker
+    hass: HomeAssistant, hass_storage: dict, aioclient_mock: AiohttpClientMocker
 ) -> None:
     # As 1.0 stored them: an area along the border with no stretch of it, and no activity.
     old = {"code": "EFR901", "name": "HONKANIEMI", "ring": [[65.0, 26.0], [65.0, 26.1], [64.8, 26.1], [65.0, 26.0]]}
@@ -160,7 +160,7 @@ async def test_areas_stored_in_an_older_form_are_fetched_again(
 
 
 async def test_a_new_restricted_area_fires_the_event_once(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, DANGER)
     entry = await set_up(hass)
@@ -183,9 +183,7 @@ async def test_a_new_restricted_area_fires_the_event_once(
     assert len(events) == 2
 
 
-async def test_the_memory_across_a_reload(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
-) -> None:
+async def test_the_memory_across_a_reload(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory) -> None:
     answer(aioclient_mock, RESTRICTED, DANGER)
     entry = await set_up(hass)
     events = async_capture_events(hass, EVENT_NEW_RESTRICTION)
@@ -203,7 +201,7 @@ async def test_the_memory_across_a_reload(
 
 
 async def test_the_memory_written_when_home_assistant_stops(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, RESTRICTED, DANGER)
     entry = await set_up(hass)
@@ -226,7 +224,7 @@ async def test_the_memory_written_when_home_assistant_stops(
 
 
 async def test_a_supplement_no_notam_names_for_30_days_is_dropped(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, DANGER)
     entry = await set_up(hass)
@@ -242,7 +240,7 @@ async def test_a_supplement_no_notam_names_for_30_days_is_dropped(
 
 
 async def test_the_aip_once_a_day_and_each_supplement_once(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, DANGER)
     entry = await set_up(hass)
@@ -258,7 +256,7 @@ async def test_the_aip_once_a_day_and_each_supplement_once(
 
 
 async def test_an_unchanged_bulletin_is_not_read_again(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, RESTRICTED)
     entry = await set_up(hass)
@@ -272,7 +270,7 @@ async def test_an_unchanged_bulletin_is_not_read_again(
 
 
 async def test_an_older_bulletin_from_the_cdn_is_ignored(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, RESTRICTED, last_modified="Mon, 02 Nov 2026 10:01:23 GMT")
     entry = await set_up(hass)
@@ -294,7 +292,7 @@ async def test_an_older_bulletin_from_the_cdn_is_ignored(
 
 
 async def test_unavailable_until_the_bulletin_can_be_read_at_setup(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     events = async_capture_events(hass, EVENT_NEW_RESTRICTION)
     answer(aioclient_mock, RESTRICTED, bulletin_status=500)
@@ -309,7 +307,6 @@ async def test_unavailable_until_the_bulletin_can_be_read_at_setup(
 
 
 async def test_a_failing_source_warns_once_until_it_works_again(
-    enable_custom_integrations,
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
     freezer: FrozenDateTimeFactory,
@@ -362,7 +359,6 @@ async def test_a_failing_source_warns_once_until_it_works_again(
     ids=["bulletin", "enr", "supplement"],
 )
 async def test_a_connection_error_is_named_in_the_log(
-    enable_custom_integrations,
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
     caplog: pytest.LogCaptureFixture,
@@ -380,7 +376,7 @@ async def test_a_connection_error_is_named_in_the_log(
 
 
 async def test_unavailable_when_the_bulletin_cant_be_read(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, RESTRICTED)
     entry = await set_up(hass)
@@ -402,7 +398,7 @@ async def test_unavailable_when_the_bulletin_cant_be_read(
 
 
 async def test_without_enr_5_1_its_areas_are_not_found(
-    enable_custom_integrations, hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker, freezer: FrozenDateTimeFactory
 ) -> None:
     answer(aioclient_mock, RESTRICTED, DANGER, enr_status=500)
     entry = await set_up(hass)
