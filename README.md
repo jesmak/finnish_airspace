@@ -242,7 +242,13 @@ python3.14 -m venv .venv
 `scripts/border.py` writes `border.json` from the National Land Survey's data, and is run again only for a new edition
 or a stretch of the border ENR 5.1 starts to follow. It needs `pyshp` and `pyproj`, which the integration itself doesn't.
 
-The pictures come from [hass-screenshots](https://github.com/jesmak/hass-screenshots) and `docs/screenshots.json`.
+The README's screenshots come from made-up data in `docs/screenshots.json`.
+
+## Contributing
+
+Pull requests are welcome. Open them against the `dev` branch, where the work for the next release is collected.
+`main` holds the latest release and moves only when a new one is made, so this README always describes the released
+version.
 
 ## Support
 
